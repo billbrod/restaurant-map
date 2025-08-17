@@ -10,6 +10,7 @@ dependencies = [
     "tinydb",
     "pydantic-settings",
     "jinja2>=3.1.6",
+    "pytailwindcss>=0.2.0",
 ]
 
 [project.scripts]
