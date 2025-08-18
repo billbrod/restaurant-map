@@ -1,0 +1,202 @@
+{
+    "points": {
+        "1": {
+            "geometry": {
+                "coordinates": [
+                    -73.888352,
+                    40.743693
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-11 00:43:27.074981",
+                "description": "A Thai market run by the one and only P'Noi, a purveyor of rare and essential Thai foods and homewares, including popular under-the-table foods made in the community and from all over Thailand.",
+                "id": "34491dfb-9fa9-4ce9-834a-8fdc41f2dfee",
+                "name": "Thai Thai Grocery",
+                "tags": "Queens Tour,grocery,Southeast Asian"
+            },
+            "type": "Feature"
+        },
+        "10": {
+            "geometry": {
+                "coordinates": [
+                    -73.8918625,
+                    40.7475702
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-11 00:43:27.073750",
+                "description": "A diminutive Burmese market for the small but growing Burmese diaspora in the neighborhood. The place to restock your fermented tea (laphet) supplies and pick up illicit local Burmese honey packed in repurposed brandy bottles.",
+                "id": "176414a4-f156-45d3-85c3-455b829137d7",
+                "name": "Little Myanmar Mini Mart",
+                "tags": "Queens Tour,grocery,Southeast Asian"
+            },
+            "type": "Feature"
+        },
+        "11": {
+            "geometry": {
+                "coordinates": [
+                    -73.891402,
+                    40.7473822
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-11 00:43:27.070260",
+                "description": "A Tibetan food truck making momos (dumplings) and other quick bites in the style of the city of Amdo. The beef (sha) momos are purse-shaped dumplings filled with beef tinged with Sichuan peppercorns and served with a fiery hot sauce and funky daikon pickle. The truck also provides bone broth to sip in cold weather.",
+                "id": "fe671c93-6449-4aed-b69e-b812060fdf15",
+                "name": "Amdo Kitchen",
+                "tags": "Queens Tour,South Asian,restaurant"
+            },
+            "type": "Feature"
+        },
+        "2": {
+            "geometry": {
+                "coordinates": [
+                    -73.888129,
+                    40.7436632
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-11 00:43:27.077629",
+                "description": "Boyd Vich and his family run this tiny cafe with a giant menu of sweet and savory snacks. The most baroque of the lot is the \"rooty tooty\" section, which includes a Thai tea shaved ice showered with corn flakes, cubes of white bread, and condensed milk.",
+                "id": "8bd30fca-b126-4f25-9cc9-02645f12d230",
+                "name": "Tea Cup Cafe",
+                "tags": "Queens Tour,cafe,dessert,Southeast Asian"
+            },
+            "type": "Feature"
+        },
+        "3": {
+            "geometry": {
+                "coordinates": [
+                    -73.8880977,
+                    40.7433455
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-11 00:43:27.076601",
+                "description": "A Thai homestyle steam table operation with cute hipsters and Edison bulbs in the front of house and serious aunty cooking chops in the back. You won't find their fermented bamboo curry anywhere else in Queens.",
+                "id": "27b8f1fc-1fe8-4c4f-8748-67230639fe41",
+                "name": "Khao Kang",
+                "tags": "Queens Tour,restaurant,Southeast Asian"
+            },
+            "type": "Feature"
+        },
+        "4": {
+            "geometry": {
+                "coordinates": [
+                    -73.8856385,
+                    40.7473098
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-11 00:43:27.068496",
+                "description": "A bodega with a secret Veracruzano seafood operation in the back. The specialty here is the seafood cocktails, or cocteles, of shrimp and octopus in tall cups with tomato juice, clam juice, a spritz of lime, wedges of avocado, and a touch of red onion and hot sauce. We also tried their crab empanadas, split open and filled with crab meat right after frying.",
+                "id": "483d4e68-feb7-4221-89d3-084cc2be5a4e",
+                "name": "La Esquina Del Camaron Mexicano",
+                "tags": "Queens Tour,Latin American,restaurant"
+            },
+            "type": "Feature"
+        },
+        "5": {
+            "geometry": {
+                "coordinates": [
+                    -73.8863178,
+                    40.7494074
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-11 00:43:27.067438",
+                "description": "A Colombian bakery and diner with a wide array of traditional Colombian pastries. We had their bu\u00f1uelos: spherical doughnuts made with yuca flour and salted cheese.",
+                "id": "c8e7c259-2899-4edf-9c6e-9bb5c21b1ccd",
+                "name": "Seba Seba",
+                "tags": "Queens Tour,bakery,Latin American"
+            },
+            "type": "Feature"
+        },
+        "6": {
+            "geometry": {
+                "coordinates": [
+                    -73.9725633,
+                    41.506637
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "242 Main Street, Beacon, New York, United States, 12508",
+                "date_dropped": "2025-08-15T15:54:53+00:00",
+                "description": "Recommended in Eater Hudson Valley map, August 2025",
+                "id": "e28e149a-75f1-4d96-b10e-3309cb3824de",
+                "name": "Ziatun",
+                "tags": "restaurant,MENA"
+            },
+            "type": "Feature"
+        },
+        "7": {
+            "geometry": {
+                "coordinates": [
+                    -73.968756,
+                    41.5045772
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "8 Eliza Street, Beacon, New York, United States, 12508",
+                "date_dropped": "2025-08-15T15:49:45+00:00",
+                "description": "From Eater Hudson Valley map, August 2025",
+                "id": "203107bd-616c-4117-9ce1-1b9a11f86407",
+                "name": "Nansense",
+                "tags": "restaurant,South Asian"
+            },
+            "type": "Feature"
+        },
+        "8": {
+            "geometry": {
+                "coordinates": [
+                    -73.91758728027344,
+                    40.761871338256206
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-10 20:09:47",
+                "description": "Nice date night place",
+                "id": "a2b6788a-134d-0b91-2dc7-63937d12ae7b",
+                "name": "Ramro",
+                "tags": "restaurant,restaurant/fancy,South Asian"
+            },
+            "type": "Feature"
+        },
+        "9": {
+            "geometry": {
+                "coordinates": [
+                    -73.892277,
+                    40.747266
+                ],
+                "type": "Point"
+            },
+            "properties": {
+                "address": "",
+                "date_dropped": "2025-08-11 00:43:27.071554",
+                "description": "A staple late night Pakistani kebab house, especially popular with local cab drivers. The majority of Kabab King's business actually comes from catering South Asian events across the country, but the core of the operation is the little diner with ground-meat (seekh) kebabs, biryani, curries, and naan.",
+                "id": "1446fc40-9a1e-4fb4-9ef9-c86041d3bcac",
+                "name": "Kabab King",
+                "tags": "Queens Tour,South Asian,restaurant"
+            },
+            "type": "Feature"
+        }
+    }
+}
