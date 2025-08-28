@@ -1,19 +1,19 @@
 {% extends "/shared/_base.html" %}
 
 {% block content %}
-    <section id="body" class="flex flex-col bg-slate-50 justify-center items-center max-w-screen-lg m-auto">
+    <section id="body" class="flex flex-col bg-slate-50 justify-center items-center">
         <div class="flex flex-col justify-center items-center py-10">
-            <h2 class="text-2xl leading-relaxed text-slate-800 uppercase">Places</h2>
+            <h2 class="text-2xl leading-relaxed text-slate-900 uppercase">Places</h2>
             <div id="main-info" class="flex flex-col px-24 py-6">
-                <p class="py-2">Take a gander at some of my favorite places...</p>
-                </p>
-                <p class="py-2">I currently have {{points|length}} places saved.</p>
+                <p class="py-2">Currently displaying {{points|length}} places.</p>
             </div>
             <div class="flex flex-rown gap-2 flex-wrap justify-center content-center text-center w-full">
                 {% for point in points %}
-                <div class="flex flex-col bg-slate-200 hover:bg-teal-100 transition-colors ease-in-out rounded-lg content-center text-center w-1/4 h-72">
+                <div class="flex flex-col border-2 border-slate-900 hover:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center w-1/4 h-auto">
                     <span class="py-1 uppercase font-bold">{{point["properties"]["name"]}}</span>
-                    <span class="px-1 text-sm text-slate-600">{{point["properties"]["description"]}}</span>
+                    <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["address"]}}</span>
+                    <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["tags"]}}</span>
+                    <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["description"]}}</span>
                 </div>
                 {% endfor %}
             </div>
