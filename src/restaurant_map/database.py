@@ -1,10 +1,24 @@
 import tinydb
+from datetime import datetime
 import time
 import json
 import re
 import geopy
 from random import randint
 from .config import Settings
+
+# from https://cmap-docs.readthedocs.io/en/latest/catalog/qualitative/seaborn:tab10_new/
+SEABORN_TAB10 = [
+    "#4e79a7",
+    "#f28e2b",
+    "#e15759",
+    "#76b7b2",
+    "#59a14e",
+    "#edc949",
+    "#af7aa1",
+    "#ff9da7",
+    "#9c755f",
+]
 
 settings = Settings()
 GEOLOCATOR = geopy.geocoders.Nominatim(user_agent='restaurant_map')
@@ -29,8 +43,12 @@ class DataBase:
 
     def search(self, key: str, value: str, table: str = "points"):
         table = self.db.table(table)
-        q = getattr(self,query, key)
+        q = getattr(self.query, key)
         return table.search(q.search(value, flags=re.IGNORECASE))
+
+    def find_tags(self, tags: str | list[str]) -> list[dict]:
+        q = self.query.properties.tags.any(tags)
+        return db.points.search(q)
 
     def ingest_geojson(self, json_path: str):
         with open(json_path) as f:
@@ -38,6 +56,7 @@ class DataBase:
         points = geojson["features"]
         last_geocode = 0
         for pt in points:
+            pt["properties"]["date_added"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             if not pt["properties"].get("address", None):
                 print(f"getting address of {pt['properties']['name']}")
                 # to respect api limit of 1/second
@@ -45,7 +64,12 @@ class DataBase:
                     time.sleep(.1)
                 pt["properties"]["address"] = self.get_address(pt)
                 last_geocode = time.time()
-            pt["properties"]["tags"] = pt["properties"]["tags"].split(',')
+            tags = pt["properties"]["tags"].split(',')
+            pt["properties"]["tags"] = tags
+            for tag in tags:
+                if not self.tags.contains(self.query.name == tag):
+                    print(f"Adding new tag {tag}...")
+                    self.tags.insert({"name": tag, "color": SEABORN_TAB10[len(self.tags.all()) % 9]})
         self.points.insert_multiple(points)
 
     def export(self, export_path: str | None = None):
@@ -59,7 +83,19 @@ class DataBase:
             with open(export_path, "w") as f:
                 json.dump(data, f)
 
-    def get_address(self, point):
+    def get_address(self, point: dict) -> str:
         coords = point["geometry"]["coordinates"]
         coords = f"{coords[1]},{coords[0]}"
         return GEOLOCATOR.reverse(coords).address
+
+    def rename_tag(self, old_tag: str, new_tag: str):
+        self.tags.update({"name": new_tag}, self.query.name == old_tag)
+        def update_tag(old_tag, new_tag):
+            def transform(doc):
+                try:
+                    doc["properties"]["tags"].remove(old_tag)
+                    doc["properties"]["tags"].append(new_tag)
+                except ValueError:
+                    pass
+            return transform
+        self.points.update(update_tag(old_tag, new_tag))

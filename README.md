@@ -10,8 +10,11 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and folium. base
 
 ## todo
 
-- fix styling on main
-- do I need about?
+- add types to tags? type, subtypes, cuisines, details
+    - then display tags in that order, sorted within each category
+    - if type not specified, consider it a detail
+- show tags at top of page and filter them by tapping on them
+- add folium view
 - then [ch 4](https://github.com/tataraba/simplesite/blob/main/docs/04_Chapter_4.md)
 
 ## Related links

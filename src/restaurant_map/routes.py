@@ -11,10 +11,9 @@ router = APIRouter()
 @router.get("/")
 def index(request: Request):
     db = DataBase()
-    return templates.TemplateResponse("main.html", {"request": request, "points": db.points.all()})
-
-
-@router.get("/about")
-def about(request: Request):
-    """About page - some background information about this app."""
-    return templates.TemplateResponse("about.html", {"request": request})
+    return templates.TemplateResponse("main.html",
+                                      {
+                                          "request": request,
+                                          "points": db.points.all(),
+                                          "tags": db.tags.all(),
+                                       })
