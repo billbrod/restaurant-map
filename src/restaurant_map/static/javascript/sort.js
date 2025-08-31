@@ -10,7 +10,7 @@ function sort_by_distance(target_location) {
   // from https://stackoverflow.com/a/9436948
   if (typeof target_location === 'string' || target_location instanceof String) {
     target_location = convert_str_to_lngLat(target_location)
-  } else {
+  } else if (!Array.isArray(target_location)) {
     target_location = [target_location['lng'], target_location['lat']]
   }
   return function(a, b) {

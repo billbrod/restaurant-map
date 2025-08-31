@@ -38,6 +38,9 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
     - [ ] should have "more info" button, which shows everything about current point. same as edit view, but can't edit
 - [ ] tag view? showing all tags, with number of tagged places, and making ontology clear
 - [ ] lists: add selected points / tags to list, then have separate ability to just view them
+- [ ] make website a [progressive web
+      app](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps#tutorials)
+      with offline support
 
 ## Related links
 
