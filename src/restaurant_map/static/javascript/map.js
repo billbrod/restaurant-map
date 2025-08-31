@@ -14,6 +14,13 @@ const map = new maplibregl.Map({
   zoom: 11,
   center: [-73.925, 40.776],
 })
+
+function sort_and_scroll(lngLat) {
+  var result = $("#points-list").children().sort(sort_by_distance(lngLat))
+  result.appendTo($("#points-list"))
+  $("#points-list").scrollTop(0)
+}
+
 // Add geolocate control to the map.
 let geolocate = new maplibregl.GeolocateControl({
   positionOptions: {
@@ -24,6 +31,18 @@ map.addControl(geolocate);
 map.on('load', async () => {
   geolocate.trigger();
   let points = await data;
+  let click_marker = new maplibregl.Marker();
+  var marker_on_map = false;
+  var marker_just_removed = false;
+  $("#points-list").children().map((i, d) => {
+    $(d).on('click', () => {
+      map.flyTo({center: convert_str_to_lngLat($(d).data("coords"))})
+      sort_and_scroll($(d).data("coords"))
+      click_marker.remove()
+      marker_on_map = false;
+      marker_just_removed = false;
+    })
+  })
   map.addSource("locations", {
     type: "geojson",
     data: points,
@@ -94,6 +113,7 @@ map.on('load', async () => {
       center: features[0].geometry.coordinates,
       zoom
     });
+    e.clickOnLayer = true;
   });
   map.on('click', 'unclustered-points', (e) => {
     const coordinates = e.features[0].geometry.coordinates.slice();
@@ -118,5 +138,30 @@ map.on('load', async () => {
                   .setLngLat(coordinates)
                   .setHTML(popup_text)
                   .addTo(map);
+    e.clickOnLayer = true;
   });
+  click_marker.getElement().addEventListener('click', (e) => {
+    click_marker.remove()
+    marker_on_map = false;
+    // need this otherwise the following click function places the marker as
+    // soon as we remove it
+    marker_just_removed = true;
+  })
+  map.on('click', (e) => {
+    // don't do this if we clicked a layer, from
+    // https://stackoverflow.com/a/72979042. also, don't do this if there's no
+    // points-list (so we're in map-only view)
+    if (e.clickOnLayer || $("#points-list").length == 0) {
+      return;
+    }
+    click_marker.setLngLat(e.lngLat)
+    if (marker_on_map === false && marker_just_removed === false) {
+      click_marker.addTo(map)
+      marker_on_map = true
+    }
+    marker_just_removed = false;
+    if (marker_on_map === true) {
+      sort_and_scroll(click_marker.getLngLat())
+    }
+  })
 })

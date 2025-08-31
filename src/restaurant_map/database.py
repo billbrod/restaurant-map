@@ -60,8 +60,7 @@ class DataBase:
             pt["properties"]["date_added"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             coords = str(pt["geometry"]["coordinates"])
             hash_id = hashlib.sha256(coords.encode()).hexdigest()
-            # ids must always start with a letter
-            pt["properties"]["id"] = f"pt-{hash_id}"
+            pt["properties"]["id"] = hash_id
             if not pt["properties"].get("address", None):
                 print(f"getting address of {pt['properties']['name']}")
                 # to respect api limit of 1/second

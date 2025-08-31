@@ -19,8 +19,11 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 - [ ] also add to db:
     - [ ] visited: date, rating, review, dishes (with four point scale: incredible, good, fine, bad)
     - [ ] should there be an overall rating? which is just mean of all ratings? or have an option to do something like mean/latest?
-    - [x] id: hash of coordinates, then use that for selections
-- [ ] on both view, click on either map or list should jump corresponding pointin other
+    - [X] id: hash of coordinates, then use that for selections
+- [X] on both view, click on either map or list should jump corresponding pointin other
+    - list to map: can call map.flyTo with the coordinates directly
+    - map to list: need to check which view we're in, to determine whether to highlight on list or display popup
+        - add list sort by distance to click, and just trigger that
 - [ ] on both view, sort by distance from current location
 - [ ] ingest geojson:
     - [ ] don't add duplicate based on coordinates

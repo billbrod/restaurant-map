@@ -15,9 +15,10 @@
                 <div class="grid {{ cols }} h-screen">
             {% endif %}
             {% if type in ["both", "list"] %}
-                <span class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll">
+                <span id="points-list" class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll">
                     {% for point in points %}
-                        <div id="{{point['properties']['id']}}" class="flex flex-col border-2 border-slate-900 hover:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center h-auto">
+                        <div id="pt-{{point['properties']['id']}}" data-coords={{point["geometry"]["coordinates"]|join(',')}}
+                             class="flex flex-col border-2 border-slate-900 hover:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center h-auto">
                             <span class="py-1 uppercase font-bold">{{point["properties"]["name"]}}</span>
                             <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["address"]}}</span>
                             {% for tag in point["properties"]["tags"] | sort %}
