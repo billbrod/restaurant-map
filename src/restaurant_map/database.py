@@ -1,4 +1,5 @@
 import tinydb
+import hashlib
 from datetime import datetime
 import time
 import json
@@ -57,6 +58,10 @@ class DataBase:
         last_geocode = 0
         for pt in points:
             pt["properties"]["date_added"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            coords = str(pt["geometry"]["coordinates"])
+            hash_id = hashlib.sha256(coords.encode()).hexdigest()
+            # ids must always start with a letter
+            pt["properties"]["id"] = f"pt-{hash_id}"
             if not pt["properties"].get("address", None):
                 print(f"getting address of {pt['properties']['name']}")
                 # to respect api limit of 1/second
@@ -78,7 +83,10 @@ class DataBase:
         for pt in data["features"]:
             pt["properties"]["tags"] = ",".join(pt["properties"]["tags"])
         if export_path is None:
-            return json.dumps(data)
+            # by not putting spaces in the separators, we're "minifying" the
+            # json, reducing the memory, see
+            # https://stackoverflow.com/a/33233406
+            return json.dumps(data, separators=(',',':'))
         else:
             with open(export_path, "w") as f:
                 json.dump(data, f)

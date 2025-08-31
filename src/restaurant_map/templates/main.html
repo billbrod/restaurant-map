@@ -1,24 +1,40 @@
 {% extends "/shared/_base.html" %}
 
+{% if type == "both" %}
+    {% set cols = "grid-cols-4" %}
+    {% set list_cols = "grid-cols-1" %}
+{% else %}
+    {% set cols = "grid-cols-1" %}
+    {% set list_cols = "grid-cols-4" %}
+{% endif %}
+
 {% block content %}
     <section id="body" class="flex flex-col bg-slate-50 justify-center items-center">
-        <div class="flex flex-col justify-center items-center py-10">
-            <h2 class="text-2xl leading-relaxed text-slate-900 uppercase">Places</h2>
-            <div id="main-info" class="flex flex-col px-24 py-6">
-                <p class="py-2">Currently displaying {{points|length}} places.</p>
-            </div>
-            <div class="flex flex-rown gap-2 flex-wrap justify-center content-center text-center w-full">
-                {% for point in points %}
-                <div class="flex flex-col border-2 border-slate-900 hover:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center w-1/4 h-auto">
-                    <span class="py-1 uppercase font-bold">{{point["properties"]["name"]}}</span>
-                    <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["address"]}}</span>
-                    {% for tag in point["properties"]["tags"] | sort %}
-                        <span class="mx-10 text-sm text-slate-200 {{tag|lower|replace(' ','-')}}">{{tag}}</span>
+        <div class="flex flex-col justify-center items-center py-10 h-screen w-screen">
+            {% if type == "both" %}
+                <div class="grid {{ cols }} h-screen">
+            {% endif %}
+            {% if type in ["both", "list"] %}
+                <span class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll">
+                    {% for point in points %}
+                        <div id="{{point['properties']['id']}}" class="flex flex-col border-2 border-slate-900 hover:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center h-auto">
+                            <span class="py-1 uppercase font-bold">{{point["properties"]["name"]}}</span>
+                            <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["address"]}}</span>
+                            {% for tag in point["properties"]["tags"] | sort %}
+                                <span class="mx-10 text-sm text-slate-200 {{tag|lower|replace(' ','-')}}">{{tag}}</span>
+                            {% endfor %}
+                            <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["description"]}}</span>
+                        </div>
                     {% endfor %}
-                    <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["description"]}}</span>
+                </span>
+            {% endif %}
+            {% if type in ["both", "map"] %}
+                <span class="col-span-3 h-full w-full" id="map"></span>
+                <script type="text/javascript" src="/static/javascript/map.js"> </script>
+            {% endif %}
+            {% if type == "both" %}
                 </div>
-                {% endfor %}
-            </div>
+            {% endif %}
         </div>
     </section>
 {% endblock %}
