@@ -29,6 +29,10 @@ let geolocate = new maplibregl.GeolocateControl({
 })
 map.addControl(geolocate);
 map.on('load', async () => {
+  geolocate.on('geolocate', (data) => {
+    sort_and_scroll({'lng': data["coords"]["longitude"],
+                     'lat': data["coords"]["latitude"]})
+  })
   geolocate.trigger();
   let points = await data;
   let click_marker = new maplibregl.Marker();

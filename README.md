@@ -24,7 +24,7 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
     - list to map: can call map.flyTo with the coordinates directly
     - map to list: need to check which view we're in, to determine whether to highlight on list or display popup
         - add list sort by distance to click, and just trigger that
-- [ ] on both view, sort by distance from current location
+- [X] on both view, sort by distance from current location
 - [ ] ingest geojson:
     - [ ] don't add duplicate based on coordinates
 - [ ] add export to text, with toggles for which fields to include
