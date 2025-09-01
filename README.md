@@ -19,21 +19,23 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 - [ ] also add to db:
     - [ ] visited: date, rating, review, dishes (with four point scale: incredible, good, fine, bad)
     - [ ] should there be an overall rating? which is just mean of all ratings? or have an option to do something like mean/latest?
-    - [X] id: hash of coordinates, then use that for selections
+    - [x] id: hash of coordinates, then use that for selections
     - [ ] url(s)
-- [X] on both view, click on either map or list should jump corresponding pointin other
+- [x] on both view, click on either map or list should jump corresponding pointin other
     - list to map: can call map.flyTo with the coordinates directly
     - map to list: need to check which view we're in, to determine whether to highlight on list or display popup
         - add list sort by distance to click, and just trigger that
-- [X] on both view, sort by distance from current location
+- [x] on both view, sort by distance from current location
 - [ ] ingest geojson:
     - [ ] don't add duplicate based on coordinates
+    - [ ] add ability to add tag to all imported points
+    - [ ] add ability to do through website?
 - [ ] color circle based on tag
 - [ ] add name when zoomed in on all the way
 - [ ] add export to text, with toggles for which fields to include
 - [ ] check how exported geojson works with organic maps or osmand
 - [ ] show tags at top of page and filter them by tapping on them
-- [ ] then [ch 4](https://github.com/tataraba/simplesite/blob/main/docs/04_Chapter_4.md)
+- [x] then [ch 4](https://github.com/tataraba/simplesite/blob/main/docs/04_Chapter_4.md)
 - [ ] add point: with all fields, autocomplete existing tags. add ability to put in either coordinates or address and geocode to other
     - [ ] import, go right to add point, pre-completing those fields. then test with google maps, organic maps, etc
 - [ ] bulk edit tags: click to select locations and then add/remove tags to all, auto-completing
