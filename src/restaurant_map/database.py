@@ -30,26 +30,30 @@ class DataBase:
         self.points = self.db.table("points")
         self.tags = self.db.table("tags")
         self.lists = self.db.table("lists")
-        self.query = tinydb.Query().properties
+        self.point_query = tinydb.Query().properties
+        self.query = tinydb.Query()
 
     def get_random(self, table: str = "points"):
         table = self.db.table(table)
         num = randint(0, len(table))
         return table.get(doc_id=num)
 
-    def find(self, key: str, value: str, table: str = "points"):
+    def find(self, key: str, value: str, table: str = "points",
+             case_sensitive: bool = False):
+        if table == "points":
+            q = getattr(self.point_query, key)
+        else:
+            q = getattr(self.query, key)
         table = self.db.table(table)
-        q = getattr(self.query, key)
-        return table.search(q == value)
-
-    def search(self, key: str, value: str, table: str = "points"):
-        table = self.db.table(table)
-        q = getattr(self.query, key)
-        return table.search(q.search(value, flags=re.IGNORECASE))
+        if not case_sensitive:
+            flags = re.IGNORECASE
+        else:
+            flags = None
+        return table.search(q.search(value, flags=flags))
 
     def find_tags(self, tags: str | list[str]) -> list[dict]:
-        q = self.query.properties.tags.any(tags)
-        return db.points.search(q)
+        q = self.point_query.tags.any(tags)
+        return self.points.search(q)
 
     def ingest_geojson(self, json_path: str):
         with open(json_path) as f:
@@ -59,8 +63,8 @@ class DataBase:
         for pt in points:
             pt["properties"]["date_added"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             coords = str(pt["geometry"]["coordinates"])
-            hash_id = hashlib.sha256(coords.encode()).hexdigest()
-            pt["properties"]["id"] = hash_id
+            pt_id = hashlib.sha256(coords.encode()).hexdigest()
+            pt["properties"]["id"] = pt_id
             if not pt["properties"].get("address", None):
                 print(f"getting address of {pt['properties']['name']}")
                 # to respect api limit of 1/second
@@ -68,7 +72,11 @@ class DataBase:
                     time.sleep(.1)
                 pt["properties"]["address"] = self.get_address(pt)
                 last_geocode = time.time()
-            tags = pt["properties"]["tags"].split(',')
+            try:
+                tags = pt["properties"]["tags"].split(',')
+            except AttributeError:
+                # then this is already a list
+                pass
             pt["properties"]["tags"] = tags
             for tag in tags:
                 if not self.tags.contains(self.query.name == tag):
@@ -76,16 +84,16 @@ class DataBase:
                     self.tags.insert({"name": tag, "color": SEABORN_TAB10[len(self.tags.all()) % 9]})
         self.points.insert_multiple(points)
 
-    def export(self, export_path: str | None = None):
-        data = {"type": "FeatureCollection"}
-        data["features"] = self.points.all()
-        for pt in data["features"]:
-            pt["properties"]["tags"] = ",".join(pt["properties"]["tags"])
+    def export(
+            self,
+            export_path: str | None = None,
+            geojson: bool = True,
+    ):
+        data = self.points.all()
+        if geojson:
+            data = {"type": "FeatureCollection", "features": data}
         if export_path is None:
-            # by not putting spaces in the separators, we're "minifying" the
-            # json, reducing the memory, see
-            # https://stackoverflow.com/a/33233406
-            return json.dumps(data, separators=(',',':'))
+            return data
         else:
             with open(export_path, "w") as f:
                 json.dump(data, f)
@@ -106,3 +114,14 @@ class DataBase:
                     pass
             return transform
         self.points.update(update_tag(old_tag, new_tag))
+
+    def update_point(self, pt_id: str, data: dict):
+        def update_properties(new_properties):
+            # this will overwrite specified fields, but leave those unincluded
+            # or with None values untouched
+            def transform(doc):
+                new_props = {k: v for k, v in new_properties.items() if v is not None}
+                doc["properties"].update(new_props)
+            return transform
+        self.points.update(update_properties(data),
+                           self.point_query.id == pt_id)

@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Any
 
-from fastapi.responses import HTMLResponse
 from pydantic_settings import BaseSettings
 from typing import Any
 
@@ -20,7 +19,6 @@ class Settings(BaseSettings):
         "title": "Simple Site",
         "description": "Simple site for viewing and editing restaurants",
         "version": "0.1.0",
-        "default_response_class": HTMLResponse,
     }
 
     DISABLE_DOCS: bool = True

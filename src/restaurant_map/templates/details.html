@@ -1,17 +1,46 @@
 {% extends "/shared/_base.html" %}
 
 {% block content %}
-<div id="modal" _="on closeModal add .closing then wait for animationend then remove me">
+
+{% if type == "form" %}
+    {% set outer_tag = "form" %}
+    {% set outer_hx = (
+        "hx-post=/details/" + point['properties']['id'] +
+        " hx-target=#pt-" + point['properties']['id']
+    ) %}
+    {% macro inner_tag(name, value) %}
+        {% if name == "name" %}
+            <input class="border-2  rounded-md p-1" type="text" name="{{name}}" value="{{value}}">
+        {% else %}
+            {% if name == "description" %}
+                {% set extra_class = "h-40" %}
+            {% else %}
+                {% set extra_class = "" %}
+            {% endif %}
+            <textarea class="w-full {{extra_class}} leading-6 p-2 border-2 rounded-md" name="{{name}}">{{value}}</textarea>
+        {% endif %}
+    {% endmacro %}
+{% else %}
+    {% set outer_tag = "div" %}
+    {% set outer_hx = "hx-target=this" %}
+    {% macro inner_tag(name, value) %}
+        {{value}}
+    {% endmacro %}
+{% endif %}
+
+<{{outer_tag}} {{outer_hx}} hx-swap='outerHTML' id="modal" _="on closeModal add .closing then wait for animationend then remove me">
     <div class="modal-underlay" _="on click trigger closeModal"></div>
     <div class="modal-content">
-        <div><label>Name</label>: {{point["properties"]["name"]}}</div>
+        <div><label>Name</label>: {{inner_tag("name", point["properties"]["name"])}}</div>
         <div class="my-3">
             {% for tag in point["properties"]["tags"] | sort %}
                 <span class="p-2 text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}}">{{tag}}</span>
             {% endfor %}
         </div>
         <div>
-            <label>Address</label>: <div class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["address"]}}</div>
+            <label>Address</label>: <div class="py-1 px-1 text-sm text-slate-600">
+                {{inner_tag("address", point["properties"]["address"])}}
+            </div>
         </div>
         <div>
             <label>Date Added</label>: <div class="py-1 px-1 text-sm text-slate-600">
@@ -19,13 +48,28 @@
         </div>
         <div>
             <label>Description</label>: <div class="py-1 px-1 text-sm text-slate-600">
-                {{point["properties"]["description"]}}</div>
+                {{inner_tag("description", point["properties"]["description"])}}</div>
         </div>
         <br>
-        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            _="on click trigger closeModal">
-            Close
-        </button>
+        {% if type == "form" %}
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    type="submit" _="on click trigger closeModal">
+                Submit
+            </button>
+            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                     _="on click trigger closeModal">
+                Cancel
+            </button>
+        {% else %}
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    hx-get="/details/{{point['properties']['id']}}/edit">
+                Edit
+            </button>
+            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    _="on click trigger closeModal">
+                Close
+            </button>
+        {% endif %}
     </div>
-</div>
+</{{outer_tag}}>
 {% endblock %}
