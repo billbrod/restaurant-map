@@ -30,6 +30,12 @@
   <!-- jquery -->
   <script type="text/javascript" src="/static/javascript/jquery-3.7.1.min.js"></script>
 
+  <!-- htmx -->
+  <script type="text/javascript" src="/static/javascript/htmx.min.js"></script>
+
+  <!-- hyperscrpit -->
+  <script src="/static/javascript/hyperscript-0.9.14.min.js"></script>
+
   <style type="text/css">
    {% for tag in tags %}
    .{{ tag['name'] | lower | replace(' ','-') }} {
@@ -42,17 +48,14 @@
 
 <body>
     {% block header %}
-    {% include "/shared/_header.html" %}
+      {% include "/shared/_header.html" %}
     {% endblock %}
 
     {% block content %}
     {% endblock %}
 
-    {% block sidebar %}
-    {% endblock %}
-
     {% block footer %}
-    {% include "/shared/_footer.html" %}
+      {% include "/shared/_footer.html" %}
     {% endblock %}
 </body>
 </html>

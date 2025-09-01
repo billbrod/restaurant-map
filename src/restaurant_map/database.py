@@ -30,7 +30,7 @@ class DataBase:
         self.points = self.db.table("points")
         self.tags = self.db.table("tags")
         self.lists = self.db.table("lists")
-        self.query = tinydb.Query()
+        self.query = tinydb.Query().properties
 
     def get_random(self, table: str = "points"):
         table = self.db.table(table)

@@ -1,0 +1,31 @@
+{% extends "/shared/_base.html" %}
+
+{% block content %}
+<div id="modal" _="on closeModal add .closing then wait for animationend then remove me">
+    <div class="modal-underlay" _="on click trigger closeModal"></div>
+    <div class="modal-content">
+        <div><label>Name</label>: {{point["properties"]["name"]}}</div>
+        <div class="my-3">
+            {% for tag in point["properties"]["tags"] | sort %}
+                <span class="p-2 text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}}">{{tag}}</span>
+            {% endfor %}
+        </div>
+        <div>
+            <label>Address</label>: <div class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["address"]}}</div>
+        </div>
+        <div>
+            <label>Date Added</label>: <div class="py-1 px-1 text-sm text-slate-600">
+                {{point["properties"]["date_added"]}}</div>
+        </div>
+        <div>
+            <label>Description</label>: <div class="py-1 px-1 text-sm text-slate-600">
+                {{point["properties"]["description"]}}</div>
+        </div>
+        <br>
+        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            _="on click trigger closeModal">
+            Close
+        </button>
+    </div>
+</div>
+{% endblock %}

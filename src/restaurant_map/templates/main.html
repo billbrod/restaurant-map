@@ -19,7 +19,11 @@
                     {% for point in points %}
                         <button id="pt-{{point['properties']['id']}}" data-coords={{point["geometry"]["coordinates"]|join(',')}}
                              class="flex flex-col border-2 border-slate-900 focus:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center h-auto">
-                            <span class="py-1 uppercase font-bold">{{point["properties"]["name"]}}</span>
+                            <span class="py-1 uppercase font-bold">
+                                {{point["properties"]["name"]}}
+                                <img hx-get="/details" hx-target="body" hx-swap="beforeend" id="info-{{point['properties']['id']}}"
+                                     class="inline" src="/static/images/akar-icons--info.svg"/>
+                            </span>
                             <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["address"]}}</span>
                             {% for tag in point["properties"]["tags"] | sort %}
                                 <span class="mx-10 text-sm text-slate-200 {{tag|lower|replace(' ','-')}}">{{tag}}</span>

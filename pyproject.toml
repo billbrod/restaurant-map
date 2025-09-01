@@ -12,6 +12,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "pytailwindcss>=0.2.0",
     "geopy",
+    "jinja2-fragments>=1.9.0",
 ]
 
 [project.scripts]
