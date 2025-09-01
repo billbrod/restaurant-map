@@ -14,7 +14,4 @@ def get_app() -> FastAPI:
     return app
 
 
-def main():
-    import uvicorn
-    app = get_app()
-    uvicorn.run(app, host="127.0.0.1", port=8011)
+app = get_app()

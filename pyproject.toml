@@ -5,8 +5,7 @@ description = "Simple site for viewing and editing restaurants"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi",
-    "uvicorn[standard]",
+    "fastapi[standard]",
     "tinydb",
     "pydantic-settings",
     "jinja2>=3.1.6",
@@ -15,9 +14,6 @@ dependencies = [
     "jinja2-fragments>=1.9.0",
     "python-multipart>=0.0.20",
 ]
-
-[project.scripts]
-app = "restaurant_map:main.main"
 
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]

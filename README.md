@@ -6,7 +6,7 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 
 - Use `uv` and install with `uv sync`
 - Then create the css with tailwind: `uv run tailwindcss -i src/restaurant_map/static/src/input.css -o src/restaurant_map/static/css/main.css` 
-- Then run the map with `uv run app`, then will be live at `localhost:8011`
+- Then run the map with `uv run fastapi dev src/restaurant_map/main.py --port 8011`, then will be live at `localhost:8011` (or pass `run` instead fo `dev` for production)
 
 ## todo
 
@@ -53,6 +53,7 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
     - [stackoverflow question](https://stackoverflow.com/questions/68853853/load-local-mbtiles-with-maplibre-gl-js)
 - [ ] search on map with [geocoder](https://maplibre.org/maplibre-gl-js/docs/examples/geocode-with-nominatim/)?
     - could use [geocodio](https://www.geocod.io/pricing/#tier-payg-section)? [docs](https://www.geocod.io/docs/?shell#geocoding)
+- [ ] pack it up [as docker](https://docs.astral.sh/uv/guides/integration/fastapi/#migrating-an-existing-fastapi-project) to run
 
 ## Related links
 
