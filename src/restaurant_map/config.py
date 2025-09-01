@@ -16,12 +16,10 @@ class Settings(BaseSettings):
     DATA_DIR: Path = APP_DIR.parent.parent / 'data'
 
     FASTAPI_PROPERTIES: dict[str, Any] = {
-        "title": "Simple Site",
+        "title": "Restauranter",
         "description": "Simple site for viewing and editing restaurants",
         "version": "0.1.0",
     }
-
-    DISABLE_DOCS: bool = True
 
     @property
     def fastapi_kwargs(self) -> dict[str, Any]:
@@ -32,13 +30,4 @@ class Settings(BaseSettings):
             dict: This can be unpacked as **kwargs to pass to FastAPI app.
         """
         fastapi_kwargs = self.FASTAPI_PROPERTIES
-        if self.DISABLE_DOCS:
-            fastapi_kwargs.update(
-                {
-                    "openapi_url": None,
-                    "openapi_prefix": None,
-                    "docs_url": None,
-                    "redoc_url": None,
-                }
-            )
         return fastapi_kwargs

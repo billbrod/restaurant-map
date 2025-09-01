@@ -48,18 +48,18 @@ class BasePages(str, Enum):
 
 
 @router.get("/point/{pt_id}")
-def export_point(request: Request, pt_id: str) -> Feature:
+def export_single_point(request: Request, pt_id: str) -> Feature:
     p = db.find("id", pt_id)[0]
     return p
 
 
 @router.get("/points.json")
-def export_points(request: Request) -> GeoJSON:
+def export_all_points(request: Request) -> GeoJSON:
     return db.export()
 
 
 @router.get("/details/{pt_id}")
-def details(request: Request, pt_id: str) -> HTMLResponse:
+def detail_page(request: Request, pt_id: str) -> HTMLResponse:
     point = db.find("id", pt_id)[0]
     return templates.TemplateResponse(
         "details.html",
@@ -74,7 +74,7 @@ def details(request: Request, pt_id: str) -> HTMLResponse:
 
 
 @router.post("/details/{pt_id}")
-def update(
+def update_point(
         update_data: Annotated[Properties, Form()],
         pt_id: str
 ) -> HTMLResponse:
@@ -88,7 +88,7 @@ def update(
 
 
 @router.get("/details/{pt_id}/edit")
-def details(request: Request, pt_id: str) -> HTMLResponse:
+def edit_point(request: Request, pt_id: str) -> HTMLResponse:
     point = db.find("id", pt_id)[0]
     return templates.TemplateResponse(
         "details.html",
@@ -104,7 +104,7 @@ def details(request: Request, pt_id: str) -> HTMLResponse:
 
 # this needs to be last: it will grab everything else
 @router.get("/{page_path}")
-def index(request: Request, page_path: BasePages) -> HTMLResponse:
+def full_pages(request: Request, page_path: BasePages) -> HTMLResponse:
     if page_path is BasePages.index_pg:
         pg_type = "both"
     elif page_path is BasePages.map_pg:
