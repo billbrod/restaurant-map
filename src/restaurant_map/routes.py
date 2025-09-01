@@ -57,7 +57,6 @@ def details(request: Request):
         point = db.find("id", pt_id)[0]
     except AttributeError:
         point = db.get_random()
-    print(point)
     return templates.TemplateResponse(
         "details.html",
         {
