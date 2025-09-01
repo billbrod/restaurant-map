@@ -20,6 +20,7 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
     - [ ] visited: date, rating, review, dishes (with four point scale: incredible, good, fine, bad)
     - [ ] should there be an overall rating? which is just mean of all ratings? or have an option to do something like mean/latest?
     - [X] id: hash of coordinates, then use that for selections
+    - [ ] url(s)
 - [X] on both view, click on either map or list should jump corresponding pointin other
     - list to map: can call map.flyTo with the coordinates directly
     - map to list: need to check which view we're in, to determine whether to highlight on list or display popup
@@ -27,6 +28,8 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 - [X] on both view, sort by distance from current location
 - [ ] ingest geojson:
     - [ ] don't add duplicate based on coordinates
+- [ ] color circle based on tag
+- [ ] add name when zoomed in on all the way
 - [ ] add export to text, with toggles for which fields to include
 - [ ] check how exported geojson works with organic maps or osmand
 - [ ] show tags at top of page and filter them by tapping on them
@@ -41,6 +44,15 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 - [ ] make website a [progressive web
       app](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps#tutorials)
       with offline support
+    - offline should be readonly? would it be possible to get it working for
+      other people who won't be connected to my webserver all the time
+- [ ] offline maps? using pmtiles? resources
+    - [maplibre issue](https://github.com/maplibre/maplibre-gl-js/discussions/1580)
+    - [pmtiles docs](https://docs.protomaps.com/pmtiles/maplibre)
+    - [maplibre docs](https://web.archive.org/web/20250822100700/https://maplibre.org/maplibre-gl-js/docs/examples/pmtiles-source-and-protocol/)
+    - [stackoverflow question](https://stackoverflow.com/questions/68853853/load-local-mbtiles-with-maplibre-gl-js)
+- [ ] search on map with [geocoder](https://maplibre.org/maplibre-gl-js/docs/examples/geocode-with-nominatim/)?
+    - could use [geocodio](https://www.geocod.io/pricing/#tier-payg-section)? [docs](https://www.geocod.io/docs/?shell#geocoding)
 
 ## Related links
 
