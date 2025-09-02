@@ -30,8 +30,9 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
     - [ ] don't add duplicate based on coordinates
     - [ ] add ability to add tag to all imported points
     - [ ] add ability to do through website?
-- [ ] color circle based on tag
-- [ ] add name when zoomed in on all the way
+- [x] color circle based on tag. 
+    - [ ] right now just picking a tag, but should pick something reasonable in ontoogy 
+- [x] add name when zoomed in on all the way
 - [ ] add export to text, with toggles for which fields to include
 - [ ] check how exported geojson works with organic maps or osmand
 - [ ] show tags at top of page and filter them by tapping on them
@@ -48,6 +49,7 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
       with offline support
     - offline should be readonly? would it be possible to get it working for
       other people who won't be connected to my webserver all the time
+    - [maplibre use local geojson](https://maplibre.org/maplibre-gl-js/docs/examples/view-local-geojson/)
 - [ ] offline maps? using pmtiles? resources
     - [maplibre issue](https://github.com/maplibre/maplibre-gl-js/discussions/1580)
     - [pmtiles docs](https://docs.protomaps.com/pmtiles/maplibre)

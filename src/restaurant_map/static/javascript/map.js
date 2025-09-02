@@ -1,12 +1,12 @@
-async function getData() {
-  let response = await fetch("/points.json")
+async function getData(data) {
+  let response = await fetch(data)
   if (!response.ok) {
     throw new Error(`Response status: ${response.status}`)
   }
   return await response.json();
 }
 
-data = getData()
+var points = getData("/points.json?add_tags=color")
 
 const map = new maplibregl.Map({
   container: "map",
@@ -34,7 +34,7 @@ map.on('load', async () => {
                      'lat': data["coords"]["latitude"]})
   })
   geolocate.trigger();
-  let points = await data;
+  points = await points;
   let click_marker = new maplibregl.Marker();
   var marker_on_map = false;
   var marker_just_removed = false;
@@ -59,10 +59,11 @@ map.on('load', async () => {
     id: "unclustered-points",
     type: "circle",
     source: "locations",
+    filter: ['!', ['has', 'point_count']],
     paint: {
-      "circle-color": "#11b4da",
-      "circle-radius": 5,
-      "circle-stroke-width": 1,
+      "circle-color": ["get", "color"],
+      "circle-radius": 6,
+      "circle-stroke-width": 2,
       "circle-stroke-color": "#000",
     },
   })
@@ -119,6 +120,23 @@ map.on('load', async () => {
       zoom
     });
     e.clickOnLayer = true;
+  });
+  map.addLayer({
+    id: 'location-name',
+    type: 'symbol',
+    source: 'locations',
+    filter: ['!', ['has', 'point_count']],
+    layout: {
+      'text-field': ["get", "name"],
+      'text-font': ['Noto Sans Regular'],
+      'text-size': 12,
+      'text-offset': [0, -1],
+      'text-anchor': "bottom",
+    },
+    paint: {
+      'text-halo-color': '#fff',
+      'text-halo-width': 100,
+    }
   });
   map.on('click', 'unclustered-points', (e) => {
     const coordinates = e.features[0].geometry.coordinates.slice();

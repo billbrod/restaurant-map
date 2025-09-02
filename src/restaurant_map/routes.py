@@ -28,6 +28,7 @@ class Properties(BaseModel):
     date_added: str | None = None
     id: str | None = None
     tags: list[str] | None = None
+    color: str | None = None
 
 
 class Feature(BaseModel):
@@ -54,8 +55,18 @@ def export_single_point(request: Request, pt_id: str) -> Feature:
 
 
 @router.get("/points.json")
-def export_all_points(request: Request) -> GeoJSON:
-    return db.export()
+def export_all_points(
+        request: Request,
+        add_tags: str = ""
+) -> GeoJSON:
+    points = db.export()
+    tags = db.export(geojson=False, table="tags")
+    tags = {"color": {t["name"]: t["color"] for t in tags}}
+    add_tags = add_tags.split(",")
+    for tag in add_tags:
+        for pt in points["features"]:
+            pt["properties"][tag] = tags[tag][pt["properties"]["tags"][-1]]
+    return points
 
 
 @router.get("/details/{pt_id}")

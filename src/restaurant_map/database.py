@@ -88,8 +88,9 @@ class DataBase:
             self,
             export_path: str | None = None,
             geojson: bool = True,
+            table: str = "points",
     ):
-        data = self.points.all()
+        data = self.db.table(table).all()
         if geojson:
             data = {"type": "FeatureCollection", "features": data}
         if export_path is None:
