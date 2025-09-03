@@ -41,6 +41,12 @@
                 <span class="col-span-3 h-full w-full" id="map"></span>
                 <script type="text/javascript" src="/static/javascript/map.js"> </script>
             {% endif %}
+            {% if type == "map" %}
+                {% for point in points %}
+                    <div id="trigger-{{point['properties']['id']}}" hx-get="/details/{{point['properties']['id']}}"
+                         hx-target="body" hx-trigger="detail-{{point['properties']['id']}} from:body" hx-swap="beforeend"></div>
+                {% endfor %}
+            {% endif %}
             {% if type == "both" %}
                 </div>
             {% endif %}

@@ -142,26 +142,8 @@ map.on('load', async () => {
     const coordinates = e.features[0].geometry.coordinates.slice();
     const properties = e.features[0].properties;
     if ($("#points-list").length == 0) {
-
-      let popup_text = `<div class="py-1 text-lg text-center uppercase font-bold">${properties.name}</div>`
-      properties.tags.split(',').sort().forEach(tag => {
-        let tag_class = tag.toLowerCase().replaceAll(' ', '-')
-        popup_text = popup_text + `<div class="mx-10 text-sm text-slate-200 ${tag_class} text-center">${tag}</div>`
-      })
-      popup_text = popup_text + `<div class="py-1 px-1 text-sm text-slate-600">${properties.address}</div>`
-      popup_text = popup_text + `<span class="py-1 px-1 text-sm text-slate-600">${properties.description}</span>`
-
-      // Ensure that if the map is zoomed out such that
-      // multiple copies of the feature are visible, the
-      // popup appears over the copy being pointed to.
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
-
-      new maplibregl.Popup()
-                    .setLngLat(coordinates)
-                    .setHTML(popup_text)
-                    .addTo(map);
+      $(`#trigger-${properties.id}`).prop('checked', true)
+      htmx.trigger(`#trigger-${properties.id}`, `detail-${properties.id}`)
     } else {
       sort_and_scroll(coordinates)
       click_marker.remove()
