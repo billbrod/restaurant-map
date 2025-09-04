@@ -61,7 +61,7 @@ map.on('load', async () => {
     source: "locations",
     filter: ['!', ['has', 'point_count']],
     paint: {
-      "circle-color": ["get", "color"],
+      "circle-color": ["get", "color", ["get", "display", ["properties"]]],
       "circle-radius": 6,
       "circle-stroke-width": 2,
       "circle-stroke-color": "#000",

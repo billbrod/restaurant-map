@@ -21,6 +21,10 @@ class Geometry(BaseModel):
     type: str
 
 
+class DisplayTags(BaseModel):
+    color: str
+
+
 class Properties(BaseModel):
     name: str
     address: str
@@ -28,6 +32,7 @@ class Properties(BaseModel):
     date_added: str | None = None
     id: str | None = None
     tags: list[str] | None = None
+    display: DisplayTags | None = None
 
 
 class Feature(BaseModel):
@@ -64,7 +69,11 @@ def export_all_points(
     add_tags = add_tags.split(",")
     for tag in add_tags:
         for pt in points["features"]:
-            pt["properties"][tag] = tags[tag][pt["properties"]["tags"][-1]]
+            pt_tag = tags[tag][pt["properties"]["tags"][-1]]
+            try:
+                pt["properties"]["display"][tag] = pt_tag
+            except KeyError:
+                pt["properties"]["display"] = {tag: pt_tag}
     return points
 
 
