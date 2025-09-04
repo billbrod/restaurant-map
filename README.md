@@ -33,6 +33,7 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 - [x] color circle based on tag. 
     - [ ] right now just picking a tag, but should pick something reasonable in ontoogy 
 - [x] add name when zoomed in on all the way
+- [x] add toggles for included fields
 - [ ] add export to text, with toggles for which fields to include
 - [ ] check how exported geojson works with organic maps or osmand
 - [ ] show tags at top of page and filter them by tapping on them

@@ -12,10 +12,24 @@
     <section id="body" class="flex flex-col bg-slate-50 justify-center items-center">
         <div class="flex flex-col justify-center items-center py-10 h-screen w-screen">
             {% if type == "both" %}
-                <div class="grid {{ cols }} h-screen">
+                <div class="grid {{ cols }} h-screen w-screen">
             {% endif %}
             {% if type in ["both", "list"] %}
-                <span id="points-list" class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll">
+                <div id="points-list" class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll relative">
+                    <div class="relative flex align-start col-span-full">
+                        <span id="filter-toggle" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200">
+                            <img class="inline" src="/static/images/tabler--list-details.svg" />
+                            Fields
+                        </span>
+                    </div>
+                    <div id="filter" class="grid gap-2 grid-cols-2 justify-items-start border-slate-200 rounded-md border-2 p-2" style="display:none">
+                        {% for tgt in filter_targets %}
+                            <span class="mx-2">
+                                <input type="checkbox" name={{tgt}} id={{tgt}}>
+                                <label for={{tgt}}>{{tgt|capitalize|replace("_", " ")}}</label>
+                            </span>
+                        {% endfor %}
+                    </div>
                     {% block point_entry %}
                         {% for point in points %}
                         <button id="pt-{{point['properties']['id']}}" data-coords={{point["geometry"]["coordinates"]|join(',')}}
@@ -23,19 +37,48 @@
                             <span class="py-1 uppercase font-bold">
                                 {{point["properties"]["name"]}}
                                 <img hx-get="/details/{{point['properties']['id']}}" hx-target="body" hx-swap="beforeend"
-                                     class="inline" src="/static/images/akar-icons--info.svg"/>
+                                     class="inline cursor-pointer" src="/static/images/akar-icons--info.svg"/>
                             </span>
-                            <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["address"]}}</span>
-                            <div class="my-2 gap-1 flex flex-row flex-wrap justify-center">
+
+                            <div class="pt-details my-2 gap-1 flex flex-row flex-wrap justify-center" id="pt-tags">
                                 {% for tag in point["properties"]["tags"] | sort %}
                                     <span class="p-2 whitespace-nowrap text-sm text-slate-200 rounded  {{tag|lower|replace(' ','-')}}">{{tag}}</span>
                                 {% endfor %}
                             </div>
-                            <span class="py-1 px-1 text-sm text-slate-600">{{point["properties"]["description"]}}</span>
+                            <span class="pt-details p-1 text-sm text-slate-600" id="pt-date_added" style="display:none">
+                                <span class="uppercase font-bold">Added: </span>
+                                {{point["properties"]["date_added"]}}
+                            </span>
+                            <span class="pt-details p-1 text-sm text-slate-600" id="pt-id" style="display:none">
+                                <span class="uppercase font-bold">Id: </span>
+                                {{point["properties"]["id"]}}
+                            </span>
+                            <span class="pt-details p-1 text-sm text-slate-600" id="pt-address">{{point["properties"]["address"]}}</span>
+                            <span class="pt-details p-1 text-sm text-slate-600" id="pt-description">{{point["properties"]["description"]}}</span>
                         </button>
                         {% endfor %}
                     {% endblock %}
-                </span>
+                    <script type="text/javascript">
+                        $("#filter-toggle").on("click", () => $("#filter").toggle())
+                        let visible_details = new Set($(".pt-details:visible").map((x, e) => $(e).prop('id')).get())
+                        $("#filter").children().children("input").each((i, e) => {
+                            if (visible_details.has(`pt-${$(e).prop('name')}`)) {
+                                $(e).prop('checked', true)
+                            } else {
+                                $(e).prop('checked', false)
+                            }
+                        })
+                        $("#filter").children().children("input").on("change", (e) => {
+                            tgt_name = `${$(e.target).prop('name')}`
+                            if (tgt_name == "tags") {
+                                tag = "div"
+                            } else {
+                                tag = "span"
+                            }
+                            $(`${tag}#pt-${tgt_name}`).toggle()
+                        })
+                    </script>
+                </div>
             {% endif %}
             {% if type in ["both", "map"] %}
                 <span class="col-span-3 h-full w-full" id="map"></span>

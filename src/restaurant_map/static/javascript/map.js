@@ -16,7 +16,7 @@ const map = new maplibregl.Map({
 })
 
 function sort_and_scroll(lngLat) {
-  var result = $("#points-list").children().sort(sort_by_distance(lngLat))
+  var result = $("#points-list").children("button").sort(sort_by_distance(lngLat))
   result.appendTo($("#points-list"))
   $("#points-list").scrollTop(0)
 }
@@ -38,7 +38,7 @@ map.on('load', async () => {
   let click_marker = new maplibregl.Marker();
   var marker_on_map = false;
   var marker_just_removed = false;
-  $("#points-list").children().map((i, d) => {
+  $("#points-list").children("button").map((i, d) => {
     $(d).on('click', () => {
       map.flyTo({center: convert_str_to_lngLat($(d).data("coords"))})
       sort_and_scroll($(d).data("coords"))

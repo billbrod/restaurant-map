@@ -28,7 +28,6 @@ class Properties(BaseModel):
     date_added: str | None = None
     id: str | None = None
     tags: list[str] | None = None
-    color: str | None = None
 
 
 class Feature(BaseModel):
@@ -129,4 +128,5 @@ def full_pages(request: Request, page_path: BasePages) -> HTMLResponse:
             "points": db.points.all(),
             "tags": db.tags.all(),
             "type": pg_type,
+            "filter_targets": [k for k in Properties.__fields__ if k not in ["name"]],
         })
