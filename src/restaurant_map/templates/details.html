@@ -1,16 +1,21 @@
-{% extends "/shared/_base.html" %}
-
-{% block content %}
-
+<style type="text/css">
+ {% for tag in tags %}
+ .{{ tag['name'] | lower | replace(' ','-') }} {
+     background-color: {{ tag['color'] }};
+ }
+ {% endfor %}
+</style>
 {% if type == "form" %}
     {% set outer_tag = "form" %}
     {% set outer_hx = (
         "hx-post=/details/" + point['properties']['id'] +
         " hx-target=#pt-" + point['properties']['id']
     ) %}
+    {% set tags_hx = "hx-delete=/tags/" + point['properties']['id'] + " hx-target=this hx-swap=outerHTML" %}
+    {% set tag_style = "cursor-pointer" %}
     {% macro inner_tag(name, value) %}
         {% if name == "name" %}
-            <input class="border-2  rounded-md p-1" type="text" name="{{name}}" value="{{value}}">
+            <input class="border-2 rounded-md p-1" type="text" name="{{name}}" value="{{value}}">
         {% else %}
             {% if name == "description" %}
                 {% set extra_class = "h-40" %}
@@ -23,20 +28,41 @@
 {% else %}
     {% set outer_tag = "div" %}
     {% set outer_hx = "hx-target=this" %}
+    {% set tags_hx = "" %}
+    {% set tag_style = "" %}
     {% macro inner_tag(name, value) %}
         {{value}}
     {% endmacro %}
 {% endif %}
 
-<{{outer_tag}} {{outer_hx}} hx-swap='outerHTML' id="modal" _="on closeModal add .closing then wait for animationend then remove me">
+<{{outer_tag}} {{outer_hx}} hx-swap='outerHTML' id="modal"
+    _="on closeModal add .closing then wait for animationend then remove me">
     <div class="modal-underlay" _="on click trigger closeModal"></div>
     <div class="modal-content">
         <div><label>Name</label>: {{inner_tag("name", point["properties"]["name"])}}</div>
-        <div class="my-3 gap-1 flex flex-row flex-wrap justify-center">
-            {% for tag in point["properties"]["tags"] | sort %}
-                <span class="p-2 text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}}">{{tag}}</span>
-            {% endfor %}
+        <div class="my-3 gap-1 flex flex-row flex-wrap justify-center" id="detail-pt-tags">
+            {% block tags %}
+                {% for tag in point["properties"]["tags"] | sort %}
+                    <span class="p-2 text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}} {{ tag_style }}"
+                          id="{{tag|lower|replace(' ', '-')}}" {{ tags_hx }}>
+                        {{tag}}
+                    </span>
+                {% endfor %}
+            {% endblock %}
         </div>
+        {% if type == "form" %}
+            <div class="justify-center flex" hx-get="/tags.css" hx-target="#tag_style" hx-trigger="keydown[key=='Enter']"
+                 hx-swap="innerHTML">
+                <input list="current_tags" autocomplete="off" id="add_tag" name="add_tag"
+                    hx-trigger="keydown[key=='Enter'] queue:first" hx-post="/tags/{{point['properties']['id']}}"
+                    hx-target="#detail-pt-tags" hx-swap="innerHTML" type="text"
+                    class="p-2 text-sm rounded-md border-2 border-slate-700"
+                    onkeydown="if (event.keyCode === 13) event.preventDefault();"
+                    onkeyup="if (event.keyCode === 13) $(this).val('');" />
+                <datalist id="current_tags" name="current_tags" hx-get="/tags" hx-trigger="load" hx-target="this"
+                    hx-swap="innerHTML"></datalist>
+            </div>
+        {% endif %}
         <div>
             <label>Address</label>: <div class="py-1 px-1 text-sm text-slate-600">
                 {{inner_tag("address", point["properties"]["address"])}}
@@ -52,24 +78,21 @@
         </div>
         <br>
         {% if type == "form" %}
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    type="submit" _="on click trigger closeModal">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit"
+                    _="on click trigger closeModal">
                 Submit
             </button>
-            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                     _="on click trigger closeModal">
+            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" _="on click trigger closeModal">
                 Cancel
             </button>
         {% else %}
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    hx-get="/details/{{point['properties']['id']}}/edit">
+                hx-get="/details/{{point['properties']['id']}}/edit">
                 Edit
             </button>
-            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    _="on click trigger closeModal">
+            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" _="on click trigger closeModal">
                 Close
             </button>
         {% endif %}
     </div>
 </{{outer_tag}}>
-{% endblock %}

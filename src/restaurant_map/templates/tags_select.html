@@ -1,0 +1,3 @@
+{% for tag in tags %}
+    <option name={{tag['name']|lower|replace(' ','-')}}>{{tag['name']}}</option>
+{% endfor %}

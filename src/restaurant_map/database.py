@@ -126,3 +126,23 @@ class DataBase:
             return transform
         self.points.update(update_properties(data),
                            self.point_query.id == pt_id)
+        if "tags" in data and data["tags"] is not None:
+            self.add_tags(data["tags"])
+
+    def add_tags(self, new_tags: str | list[str]):
+        if isinstance(new_tags, str):
+            new_tags = [new_tags]
+        for tag in new_tags:
+            if not self.tags.search(self.query.name == tag):
+                self.tags.insert({"name": tag,
+                                  "color": SEABORN_TAB10[len(self.tags.all()) % 9]})
+
+    def remove_tags(self, tags: str | list[str]):
+        if isinstance(tags, str):
+            tags = [tags]
+        for tag in tags:
+            self.tags.remove(self.query.name == tag)
+            for pt in self.find_tags(tag):
+                props = pt["properties"]
+                props["tags"].remove(tag)
+                self.update_point(props["id"], props)

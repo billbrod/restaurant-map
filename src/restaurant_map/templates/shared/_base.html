@@ -36,17 +36,19 @@
   <!-- hyperscrpit -->
   <script src="/static/javascript/hyperscript-0.9.14.min.js"></script>
 
-  <style type="text/css">
-   {% for tag in tags %}
-   .{{ tag['name'] | lower | replace(' ','-') }} {
-     background-color: {{ tag['color'] }};
-   }
-   {% endfor %}
-  </style>
-
 </head>
 
 <body>
+  <style type="text/css" id="tag_style">
+    {% block tag_css %}
+      {% for tag in tags %}
+        .{{ tag['name'] | lower | replace(' ','-') }} {
+        background-color: {{ tag['color'] }};
+        }
+      {% endfor %}
+   {% endblock %}
+  </style>
+
     {% block header %}
       {% include "/shared/_header.html" %}
     {% endblock %}

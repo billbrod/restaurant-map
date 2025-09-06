@@ -42,7 +42,7 @@
 
                             <div class="pt-details my-2 gap-1 flex flex-row flex-wrap justify-center" id="pt-tags">
                                 {% for tag in point["properties"]["tags"] | sort %}
-                                    <span class="p-2 whitespace-nowrap text-sm text-slate-200 rounded  {{tag|lower|replace(' ','-')}}">{{tag}}</span>
+                                    <span class="p-2 whitespace-nowrap text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}}">{{tag}}</span>
                                 {% endfor %}
                             </div>
                             <span class="pt-details p-1 text-sm text-slate-600" id="pt-date_added" style="display:none">
