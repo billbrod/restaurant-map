@@ -169,7 +169,7 @@ def detail_page(request: Request, pt_id: str) -> HTMLResponse:
 @router.post("/details/{pt_id}")
 def update_point(
         request: Request,
-        update_data: Annotated[FormProperties, Form()],
+        update_data: Annotated[BaseProperties, Form()],
         pt_id: str
 ) -> HTMLResponse:
     db.update_point(pt_id, update_data.dict())

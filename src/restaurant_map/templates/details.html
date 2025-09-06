@@ -11,8 +11,6 @@
         "hx-post=/details/" + point['properties']['id'] +
         " hx-target=#pt-" + point['properties']['id']
     ) %}
-    {% set tags_hx = "hx-delete=/tags/" + point['properties']['id'] + " hx-target=this hx-swap=outerHTML" %}
-    {% set tag_style = "cursor-pointer" %}
     {% macro inner_tag(name, value) %}
         {% if name == "name" %}
             <input class="border-2 rounded-md p-1" type="text" name="{{name}}" value="{{value}}">
@@ -28,8 +26,6 @@
 {% else %}
     {% set outer_tag = "div" %}
     {% set outer_hx = "hx-target=this" %}
-    {% set tags_hx = "" %}
-    {% set tag_style = "" %}
     {% macro inner_tag(name, value) %}
         {{value}}
     {% endmacro %}
@@ -42,6 +38,13 @@
         <div><label>Name</label>: {{inner_tag("name", point["properties"]["name"])}}</div>
         <div class="my-3 gap-1 flex flex-row flex-wrap justify-center" id="detail-pt-tags">
             {% block tags %}
+                {% if type == "form" %}
+                    {% set tags_hx = "hx-delete=/tags/" + point['properties']['id'] + " hx-target=this hx-swap=outerHTML" %}
+                    {% set tag_style = "cursor-pointer" %}
+                {% else %}
+                    {% set tags_hx = "" %}
+                    {% set tag_style = "" %}
+                {% endif %}
                 {% for tag in point["properties"]["tags"] | sort %}
                     <span class="p-2 text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}} {{ tag_style }}"
                           id="{{tag|lower|replace(' ', '-')}}" {{ tags_hx }}>
