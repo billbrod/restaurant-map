@@ -164,7 +164,10 @@ def points_list(
         filter_tags_exclude: Annotated[list[str] | None, Query()] = [],
 ) -> HTMLResponse:
     points = db.find_tags(filter_tags_include, filter_tags_exclude)
-    print(points)
+    if request.headers.get("hx-current-url", "list").endswith("list"):
+        subgrid = "col-span-4"
+    else:
+        subgrid = "col-span-1"
     return templates.TemplateResponse(
         "main.html",
         {
@@ -175,6 +178,7 @@ def points_list(
             "show_id": "id" in filter_text,
             "show_address": "address" in filter_text,
             "show_description": "description" in filter_text,
+            "subgrid": subgrid,
         },
         block_name="point_list",
     )
