@@ -3,9 +3,11 @@
 {% if type == "both" %}
     {% set cols = "grid-cols-4" %}
     {% set list_cols = "grid-cols-1" %}
+    {% set subgrid = "col-span-1" %}
 {% else %}
     {% set cols = "grid-cols-1" %}
     {% set list_cols = "grid-cols-4" %}
+    {% set subgrid = "col-span-4" %}
 {% endif %}
 
 {% block content %}
@@ -15,67 +17,141 @@
                 <div class="grid {{ cols }} h-screen w-screen">
             {% endif %}
             {% if type in ["both", "list"] %}
-                <div id="points-list" class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll relative">
+                <div class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll relative">
                     <div class="relative flex align-start col-span-full">
-                        <span id="filter-toggle" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200">
+                        <span id="text-filter-toggle" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2">
                             <img class="inline" src="/static/images/tabler--list-details.svg" />
                             Fields
                         </span>
+                        <span id="tag-filter-toggle" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2">
+                            <img class="inline" src="/static/images/mdi--tag-filter.svg" />
+                            Filter Tags
+                        </span>
+                        <span id="add-tags-toggle" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2">
+                            <img class="inline" src="/static/images/mdi--tag-add.svg" />
+                            Add Tags
+                        </span>
                     </div>
-                    <div id="filter" class="grid gap-2 grid-cols-2 justify-items-start border-slate-200 rounded-md border-2 p-2 mx-2" style="display:none">
+                    <form id="text-filter" class="grid gap-2 grid-cols-2 justify-items-start border-slate-200 rounded-md border-2 p-2 mx-2"
+                          style="display:none" hx-get="/points_list" hx-target="#points-list" hx-swap="outerHTML" hx-trigger="change"
+                          hx-include="#tag-filter" >
                         {% for tgt in filter_targets %}
                             <span class="mx-2">
-                                <input type="checkbox" name={{tgt}} id={{tgt}}>
+                                <input type="checkbox" name="filter_text" value={{tgt}} id={{tgt}}>
                                 <label for={{tgt}}>{{tgt|capitalize|replace("_", " ")}}</label>
                             </span>
                         {% endfor %}
+                    </form>
+                    <form id="tag-filter" class="grid grid-cols-4 justify-items-start gap-2 border-slate-200 rounded-md border-2 p-2 mx-2 w-full"
+                          style="display:none" hx-get="/points_list" hx-target="#points-list" hx-swap="outerHTML" hx-trigger="click"
+                          hx-include="#text-filter" >
+                        {% for tag in tags %}
+                            <span class="cursor-pointer" onclick="toggle_filter_state(this)">
+                                <span class="p-1 whitespace-nowrap text-sm text-slate-200 rounded {{tag['css_name']}} opacity-50">{{tag['name']}}</span>
+                                <input type="checkbox" name="filter_tags_include" value="{{tag['name']}}" id={{tag['css_name']}} style="display:none">
+                                <input type="checkbox" name="filter_tags_exclude" value="{{tag['name']}}" id={{tag['css_name']}} style="display:none">
+                            </span>
+                        {% endfor %}
+                    </form>
+                    <div id="add-tags" class="grid gap-2 grid-cols-2 justify-items-start border-slate-200 rounded-md border-2 p-2 mx-2" style="display:none">
+                        {% for tag in tags %}
+                            {% set tag = tag['name'] %}
+                            <span class="mx-2">
+                                <input type="checkbox" name={{tag}} id={{tag}}>
+                                <label for={{tag}} class="p-1 whitespace-nowrap text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}}">{{tag}}</label>
+                            </span>
+                        {% endfor %}
                     </div>
+                    {% block point_list %}
+                    <div id="points-list" class="{{ subgrid }} grid grid-cols-subgrid">
                     {% block point_entry %}
                         {% for point in points %}
                         <button id="pt-{{point['properties']['id']}}" data-coords={{point["geometry"]["coordinates"]|join(',')}}
-                             class="flex flex-col border-2 border-slate-900 focus:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center h-auto">
+                             class="flex flex-col border-2 border-slate-900 focus:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center h-auto w-full">
                             <span class="py-1 uppercase font-bold">
+                                <div class="border-2 border-slate-900 rounded-full size-5 relative top-0 left-0 m-1 cursor-pointer"
+                                     onclick="$(this).children('img').toggle(); let e = $(this).children('input'); e.prop('checked', !e.prop('checked'))">
+                                    <img class="relative size-6 -top-1 left-0" style="display:none" src="/static/images/lets-icons--check-fill.svg" />
+                                    <input class="justify-self-start" type="checkbox" id="checkbox-{{point['properties']['id']}}" style="display:none"/>
+                                </div>
                                 {{point["properties"]["name"]}}
                                 <img hx-get="/details/{{point['properties']['id']}}" hx-target="body" hx-swap="beforeend"
                                      class="inline cursor-pointer" src="/static/images/akar-icons--info.svg"/>
                             </span>
 
+                            {% if show_tags %}
                             <div class="pt-details my-2 gap-1 flex flex-row flex-wrap justify-center" id="pt-tags">
                                 {% for tag in point["properties"]["tags"] | sort %}
                                     <span class="p-2 whitespace-nowrap text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}}">{{tag}}</span>
                                 {% endfor %}
                             </div>
-                            <span class="pt-details p-1 text-sm text-slate-600" id="pt-date_added" style="display:none">
+                            {% endif %}
+                            {% if show_date_added %}
+                            <span class="pt-details p-1 text-sm text-slate-600" id="pt-date_added">
                                 <span class="uppercase font-bold">Added: </span>
                                 {{point["properties"]["date_added"]}}
                             </span>
-                            <span class="pt-details p-1 text-sm text-slate-600" id="pt-id" style="display:none">
+                            {% endif %}
+                            {% if show_id %}
+                            <span class="pt-details p-1 text-sm text-slate-600" id="pt-id" >
                                 <span class="uppercase font-bold">Id: </span>
                                 {{point["properties"]["id"]}}
                             </span>
+                            {% endif %}
+                            {% if show_address %}
                             <span class="pt-details p-1 text-sm text-slate-600" id="pt-address">{{point["properties"]["address"]}}</span>
+                            {% endif %}
+                            {% if show_description %}
                             <span class="pt-details p-1 text-sm text-slate-600" id="pt-description">{{point["properties"]["description"]}}</span>
+                            {% endif %}
                         </button>
                         {% endfor %}
                     {% endblock %}
+                    </div>
+                    {% endblock %}
                     <script type="text/javascript">
-                        $("#filter-toggle").on("click", () => $("#filter").toggle())
+
+                     function toggle_filter_state(elt) {
+                         let checkboxes = $(elt).children("input")
+                         let checked = $(elt).children("input:checked")
+                         if (checked.length == 0) {
+                             // then this is the neutral state and we should check include
+                             $(checkboxes[0]).prop('checked', true)
+                             $(elt).children("span").toggleClass("opacity-50")
+                         } else if ($(checkboxes[0]).prop('checked')) {
+                             // then include is checked and we should uncheck it, check exclude
+                             $(checkboxes[0]).prop('checked', false)
+                             $(checkboxes[1]).prop('checked', true)
+                             $(elt).children("span").toggleClass("contrast-50")
+                             $(elt).children("span").toggleClass("opacity-50")
+                             $(elt).children("span").toggleClass("grayscale")
+                         } else {
+                             // then exclude is checked and we should uncheck it
+                             $(checkboxes[1]).prop('checked', false)
+                             $(elt).children("span").toggleClass("grayscale")
+                             $(elt).children("span").toggleClass("contrast-50")
+                         }
+                     }
+
+
+                     // for some reason, can't get hx-on working, but this does the same thing
+                       htmx.on('htmx:afterSwap', (e) => {
+                           if ($(e.target).attr('id') == "points-list") {
+                               sort_and_scroll()
+                           }
+                       })
+                        $("#tag-filter-toggle").on("click", () => $("#tag-filter").toggle())
+                        $("#tag-filter input").each((i, e) => {
+                            $(e).prop('checked', false)
+                        })
+                        $("#text-filter-toggle").on("click", () => $("#text-filter").toggle())
                         let visible_details = new Set($(".pt-details:visible").map((x, e) => $(e).prop('id')).get())
-                        $("#filter").children().children("input").each((i, e) => {
-                            if (visible_details.has(`pt-${$(e).prop('name')}`)) {
+                        $("#text-filter input").each((i, e) => {
+                            if (visible_details.has(`pt-${$(e).prop('id')}`)) {
                                 $(e).prop('checked', true)
                             } else {
                                 $(e).prop('checked', false)
                             }
-                        })
-                        $("#filter").children().children("input").on("change", (e) => {
-                            tgt_name = `${$(e.target).prop('name')}`
-                            if (tgt_name == "tags") {
-                                tag = "div"
-                            } else {
-                                tag = "span"
-                            }
-                            $(`${tag}#pt-${tgt_name}`).toggle()
                         })
                     </script>
                 </div>

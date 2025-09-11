@@ -7,10 +7,11 @@
 </style>
 {% if type == "form" %}
     {% set outer_tag = "form" %}
-    {% set outer_hx = (
-        "hx-post=/details/" + point['properties']['id'] +
-        " hx-target=#pt-" + point['properties']['id']
-    ) %}
+    {% set outer_hx %}
+        hx-post=/details/{{point['properties']['id']}}
+        hx-target=#pt-{{point['properties']['id']}}
+        hx-include="#text-filter"
+    {% endset %}
     {% macro inner_tag(name, value) %}
         {% if name == "name" %}
             <input class="border-2 rounded-md p-1" type="text" name="{{name}}" value="{{value}}">

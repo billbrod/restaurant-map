@@ -51,9 +51,17 @@ class DataBase:
             flags = None
         return table.search(q.search(value, flags=flags))
 
-    def find_tags(self, tags: str | list[str]) -> list[dict]:
-        q = self.point_query.tags.any(tags)
-        return self.points.search(q)
+    def find_tags(
+            self,
+            include_tags: str | list[str] = [],
+            exclude_tags: str | list[str] = [],
+    ) -> list[dict]:
+        not_q = self.point_query.tags.any(exclude_tags)
+        if include_tags:
+            q = self.point_query.tags.any(include_tags)
+            return self.points.search(q & ~not_q)
+        else:
+            return self.points.search(~not_q)
 
     def ingest_geojson(self, json_path: str):
         with open(json_path) as f:
@@ -78,10 +86,7 @@ class DataBase:
                 # then this is already a list
                 pass
             pt["properties"]["tags"] = tags
-            for tag in tags:
-                if not self.tags.contains(self.query.name == tag):
-                    print(f"Adding new tag {tag}...")
-                    self.tags.insert({"name": tag, "color": SEABORN_TAB10[len(self.tags.all()) % 9]})
+            self.add_tags(tags)
         self.points.insert_multiple(points)
 
     def export(
@@ -135,7 +140,9 @@ class DataBase:
         for tag in new_tags:
             if not self.tags.search(self.query.name == tag):
                 self.tags.insert({"name": tag,
-                                  "color": SEABORN_TAB10[len(self.tags.all()) % 9]})
+                                  "color": SEABORN_TAB10[len(self.tags.all()) % 9],
+                                  "css_name": tag.replace(' ', '-').lower(),
+                                  })
 
     def remove_tags(self, tags: str | list[str]):
         if isinstance(tags, str):

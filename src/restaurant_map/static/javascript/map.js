@@ -15,10 +15,14 @@ const map = new maplibregl.Map({
   center: [-73.925, 40.776],
 })
 
-function sort_and_scroll(lngLat) {
-  var result = $("#points-list").children("button").sort(sort_by_distance(lngLat))
+function sort_and_scroll(lngLat = undefined) {
+  if (typeof lngLat === "undefined") {
+    lngLat = $("#map").prop('data-coords')
+  }
+  var result = $("#points-list button").sort(sort_by_distance(lngLat))
   result.appendTo($("#points-list"))
   $("#points-list").scrollTop(0)
+  $("#map").prop('data-coords', lngLat)
 }
 
 // Add geolocate control to the map.
@@ -38,7 +42,7 @@ map.on('load', async () => {
   let click_marker = new maplibregl.Marker();
   var marker_on_map = false;
   var marker_just_removed = false;
-  $("#points-list").children("button").map((i, d) => {
+  $("#points-list button").map((i, d) => {
     $(d).on('click', () => {
       map.flyTo({center: convert_str_to_lngLat($(d).data("coords"))})
       sort_and_scroll($(d).data("coords"))

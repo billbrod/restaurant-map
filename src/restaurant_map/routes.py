@@ -3,7 +3,7 @@ import time
 import json
 from typing import Annotated
 
-from fastapi import APIRouter, Request, Form, Response
+from fastapi import APIRouter, Request, Form, Response, Query
 from fastapi.responses import HTMLResponse
 from jinja2_fragments.fastapi import Jinja2Blocks
 from pydantic import BaseModel
@@ -42,6 +42,9 @@ class DisplayProperties(BaseProperties):
 class FormProperties(BaseProperties):
     add_tag: str | None = None
 
+
+class ShowProperties(BaseProperties):
+    filter_text: list[str] | None = []
 
 class Feature(BaseModel):
     geometry: Geometry
@@ -153,6 +156,30 @@ def export_all_points(
     return points
 
 
+@router.get("/points_list")
+def points_list(
+        request: Request,
+        filter_text: Annotated[list[str] | None, Query()] = [],
+        filter_tags_include: Annotated[list[str] | None, Query()] = [],
+        filter_tags_exclude: Annotated[list[str] | None, Query()] = [],
+) -> HTMLResponse:
+    points = db.find_tags(filter_tags_include, filter_tags_exclude)
+    print(points)
+    return templates.TemplateResponse(
+        "main.html",
+        {
+            "request": request,
+            "points": points,
+            "show_tags": "tags" in filter_text,
+            "show_date_added": "date_added" in filter_text,
+            "show_id": "id" in filter_text,
+            "show_address": "address" in filter_text,
+            "show_description": "description" in filter_text,
+        },
+        block_name="point_list",
+    )
+
+
 @router.get("/details/{pt_id}")
 def detail_page(request: Request, pt_id: str) -> HTMLResponse:
     point = db.find("id", pt_id)[0]
@@ -169,14 +196,24 @@ def detail_page(request: Request, pt_id: str) -> HTMLResponse:
 @router.post("/details/{pt_id}")
 def update_point(
         request: Request,
-        update_data: Annotated[BaseProperties, Form()],
-        pt_id: str
+        update_data: Annotated[ShowProperties, Form()],
+        pt_id: str,
 ) -> HTMLResponse:
-    db.update_point(pt_id, update_data.dict())
+    update_data = update_data.dict()
+    filter_text = update_data.pop("filter_text", [])
+    db.update_point(pt_id, update_data)
     point = db.find("id", pt_id)
     return templates.TemplateResponse(
         "main.html",
-        {"request": request, "points": point},
+        {
+            "request": request,
+            "points": point,
+            "show_tags": "tags" in filter_text,
+            "show_date_added": "date_added" in filter_text,
+            "show_id": "id" in filter_text,
+            "show_address": "address" in filter_text,
+            "show_description": "description" in filter_text,
+        },
         block_name="point_entry",
     )
 
@@ -211,4 +248,9 @@ def full_pages(request: Request, page_path: BasePages) -> HTMLResponse:
             "tags": db.tags.all(),
             "type": pg_type,
             "filter_targets": [k for k in BaseProperties.__fields__ if k not in ["name"]],
+            "show_tags": True,
+            "show_date_added": False,
+            "show_id": False,
+            "show_address": True,
+            "show_description": True,
         })
