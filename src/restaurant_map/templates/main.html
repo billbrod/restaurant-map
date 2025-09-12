@@ -17,7 +17,7 @@
                 <div class="grid {{ cols }} h-screen w-screen">
             {% endif %}
             {% if type in ["both", "list"] %}
-                <div class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll relative">
+                <div id="list-container" class="grid {{ list_cols }} gap-2 justify-start content-start text-center overflow-y-scroll relative">
                     <div class="relative flex align-start col-span-full">
                         <span id="text-filter-toggle" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2">
                             <img class="inline" src="/static/images/tabler--list-details.svg" />
@@ -138,6 +138,12 @@
                        htmx.on('htmx:afterSwap', (e) => {
                            if ($(e.target).attr('id') == "points-list") {
                                sort_and_scroll()
+                               $("#points-list button").map((i, d) => {
+                                   $(d).on('click', () => {
+                                       let trigger_id = $(d).attr("id").replace("pt-", "func-")
+                                       $(`#${trigger_id}`).trigger('click')
+                                   })
+                               })
                            }
                        })
                         $("#tag-filter-toggle").on("click", () => $("#tag-filter").toggle())

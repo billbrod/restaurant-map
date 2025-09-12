@@ -43,14 +43,20 @@ map.on('load', async () => {
   var marker_on_map = false;
   var marker_just_removed = false;
   $("#points-list button").map((i, d) => {
-    $(d).on('click', () => {
+    let new_id = $(d).attr("id").replace("pt-", "func-")
+    var p = $("div#list-container").append(
+      `<span style='display:none;' id='${new_id}'></span>`
+    )
+    function click_button() {
       map.flyTo({center: convert_str_to_lngLat($(d).data("coords"))})
       sort_and_scroll($(d).data("coords"))
       click_marker.remove()
       marker_on_map = false;
       marker_just_removed = false;
       $(d).trigger("focus")
-    })
+    }
+    $(`#${new_id}`).on('click', click_button)
+    $(d).on('click', click_button)
   })
   map.addSource("locations", {
     type: "geojson",
