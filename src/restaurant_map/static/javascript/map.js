@@ -56,7 +56,12 @@ map.on('load', async () => {
       $(d).trigger("focus")
     }
     $(`#${new_id}`).on('click', click_button)
-    $(d).on('click', click_button)
+    $(d).on('click', (e) => {
+      // don't invoke function if the checkbox was clicked
+      if ($(e.target).attr("id") !== "point-select" && $(e.target).parent().attr("id") !== "point-select") {
+        click_button()
+      }
+    })
   })
   map.addSource("locations", {
     type: "geojson",

@@ -29,7 +29,7 @@
                         </span>
                         <span id="add-tags-toggle" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2">
                             <img class="inline" src="/static/images/mdi--tag-add.svg" />
-                            Add Tags
+                            Edit Tags
                         </span>
                     </div>
                     <form id="text-filter" class="grid gap-2 grid-cols-2 justify-items-start border-slate-200 rounded-md border-2 p-2 mx-2"
@@ -42,37 +42,65 @@
                             </span>
                         {% endfor %}
                     </form>
-                    <form id="tag-filter" class="grid grid-cols-4 justify-items-start gap-2 border-slate-200 rounded-md border-2 p-2 mx-2 w-full"
+                    <form id="tag-filter" class="grid grid-cols-4 justify-items-start gap-2 border-slate-200 rounded-md border-2 p-2 mx-2"
                           style="display:none" hx-get="/points_list" hx-target="#points-list" hx-swap="outerHTML" hx-trigger="click"
                           hx-include="#text-filter" >
                         {% for tag in tags %}
-                            <span class="cursor-pointer" onclick="toggle_filter_state(this)">
+                            <span class="cursor-pointer" onclick="set_filter_state(this)" data-state="neutral">
                                 <span class="p-1 whitespace-nowrap text-sm text-slate-200 rounded {{tag['css_name']}} opacity-50">{{tag['name']}}</span>
                                 <input type="checkbox" name="filter_tags_include" value="{{tag['name']}}" id={{tag['css_name']}} style="display:none">
                                 <input type="checkbox" name="filter_tags_exclude" value="{{tag['name']}}" id={{tag['css_name']}} style="display:none">
                             </span>
                         {% endfor %}
                     </form>
-                    <div id="add-tags" class="grid gap-2 grid-cols-2 justify-items-start border-slate-200 rounded-md border-2 p-2 mx-2" style="display:none">
+                    {% block add_tags %}
+                    <form id="add-tags" class="grid grid-cols-4 justify-items-start gap-2 border-slate-200 rounded-md border-2 p-2 mx-2"
+                          {% if not show_add_tags %}
+                          style="display:none"
+                          {% endif %}
+                    >
                         {% for tag in tags %}
-                            {% set tag = tag['name'] %}
-                            <span class="mx-2">
-                                <input type="checkbox" name={{tag}} id={{tag}}>
-                                <label for={{tag}} class="p-1 whitespace-nowrap text-sm text-slate-200 rounded {{tag|lower|replace(' ','-')}}">{{tag}}</label>
+                            <span id={{tag['css_name']}} onclick="set_filter_state(this)" class="cursor-pointer" data-state="neutral"
+                                  hx-post="/points_list" hx-target="#points-list" hx-swap="outerHTML" hx-trigger="click"
+                                  hx-include="#tag-filter,#text-filter,[name='point_select_checkbox']">
+                                <span class="p-1 whitespace-nowrap text-sm text-slate-200 rounded {{tag['css_name']}} opacity-50">{{tag['name']}}</span>
+                                <input type="checkbox" name="add_tags_include" value="{{tag['name']}}" id={{tag['css_name']}} style="display:none">
+                                <input type="checkbox" name="add_tags_exclude" value="{{tag['name']}}" id={{tag['css_name']}} style="display:none">
                             </span>
                         {% endfor %}
-                    </div>
+                        <div class="justify-center flex" hx-get="/tags.css" hx-target="#tag_style" hx-trigger="keydown[key=='Enter']"
+                             hx-swap="innerHTML">
+                            <div hx-get="/add_tags" hx-target="#add-tags" hx-trigger="keydown[key=='Enter']"
+                                 hx-swap="outerHTML">
+                                <input autocomplete="off" id="add_tag_input" name="add_tag_input" type="text"
+                                       class="p-2 text-sm rounded-md border-2 border-slate-700 w-full"
+                                       hx-post="/points_list" hx-target="#points-list" hx-swap="outerHTML"
+                                       hx-trigger="keydown[key=='Enter']"
+                                       hx-include="#tag-filter,#text-filter,[name='point_select_checkbox']"
+                                       onkeydown="if (event.keyCode === 13) event.preventDefault();"
+                                       onkeyup="if (event.keyCode === 13) $(this).val('');" />
+                            </div>
+                        </div>
+                    </form>
+                    {% endblock %}
                     {% block point_list %}
                     <div id="points-list" class="{{ subgrid }} grid grid-cols-subgrid">
                     {% block point_entry %}
                         {% for point in points %}
                         <button id="pt-{{point['properties']['id']}}" data-coords={{point["geometry"]["coordinates"]|join(',')}}
                              class="flex flex-col border-2 border-slate-900 focus:bg-violet-100 transition-colors ease-in-out rounded-lg content-center text-center h-auto w-full">
-                            <span class="py-1 uppercase font-bold">
-                                <div class="border-2 border-slate-900 rounded-full size-5 relative top-0 left-0 m-1 cursor-pointer"
-                                     onclick="$(this).children('img').toggle(); let e = $(this).children('input'); e.prop('checked', !e.prop('checked'))">
-                                    <img class="relative size-6 -top-1 left-0" style="display:none" src="/static/images/lets-icons--check-fill.svg" />
-                                    <input class="justify-self-start" type="checkbox" id="checkbox-{{point['properties']['id']}}" style="display:none"/>
+                            <span id="pt-title" class="py-1 uppercase font-bold">
+                                <div id="point-select" class="border-2 border-slate-900 rounded-full size-5 relative top-0 left-0 m-1 cursor-pointer"
+                                     onclick="$(this).children('img').toggle(); let e = $(this).children('input'); e.prop('checked', !e.prop('checked')); update_add_tags()">
+                                    {% if point['properties']['id'] in selected %}
+                                        <img class="relative size-6 -top-1 left-0" src="/static/images/lets-icons--check-fill.svg" />
+                                        <input name="point_select_checkbox" class="justify-self-start" type="checkbox"
+                                               style="display:none" value="{{point['properties']['id']}}" checked/>
+                                    {% else %}
+                                        <img class="relative size-6 -top-1 left-0" style="display:none" src="/static/images/lets-icons--check-fill.svg" />
+                                        <input name="point_select_checkbox" class="justify-self-start" type="checkbox"
+                                               style="display:none" value="{{point['properties']['id']}}" />
+                                    {% endif %}
                                 </div>
                                 {{point["properties"]["name"]}}
                                 <img hx-get="/details/{{point['properties']['id']}}" hx-target="body" hx-swap="beforeend"
@@ -111,54 +139,99 @@
                     {% endblock %}
                     <script type="text/javascript">
 
-                     function toggle_filter_state(elt) {
-                         let checkboxes = $(elt).children("input")
-                         let checked = $(elt).children("input:checked")
-                         if (checked.length == 0) {
-                             // then this is the neutral state and we should check include
+                     function set_filter_state(elt, tgt_state = undefined) {
+                         if (tgt_state === undefined) {
+                             elt = $(elt)
+                             if (elt.closest("form").attr("id") == "add-tags") {
+                                 next_state = new Object({"active": "inactive", "inactive": "active", "neutral": "active"})
+                             } else {
+                                 next_state = new Object({"active": "inactive", "neutral": "active", "inactive": "neutral"})
+                             }
+                             tgt_state = next_state[elt.data("state")]
+                         }
+                         let checkboxes = elt.children("input")
+                         if (tgt_state == "active") {
                              $(checkboxes[0]).prop('checked', true)
-                             $(elt).children("span").toggleClass("opacity-50")
-                         } else if ($(checkboxes[0]).prop('checked')) {
-                             // then include is checked and we should uncheck it, check exclude
+                             $(checkboxes[1]).prop('checked', false)
+                             elt.children("span").removeClass("opacity-50")
+                             elt.children("span").removeClass("contrast-50")
+                             elt.children("span").removeClass("grayscale")
+                         } else if (tgt_state == "inactive") {
                              $(checkboxes[0]).prop('checked', false)
                              $(checkboxes[1]).prop('checked', true)
-                             $(elt).children("span").toggleClass("contrast-50")
-                             $(elt).children("span").toggleClass("opacity-50")
-                             $(elt).children("span").toggleClass("grayscale")
+                             elt.children("span").addClass("contrast-50")
+                             elt.children("span").addClass("opacity-50")
+                             elt.children("span").addClass("grayscale")
                          } else {
-                             // then exclude is checked and we should uncheck it
+                             $(checkboxes[0]).prop('checked', false)
                              $(checkboxes[1]).prop('checked', false)
-                             $(elt).children("span").toggleClass("grayscale")
-                             $(elt).children("span").toggleClass("contrast-50")
+                             elt.children("span").removeClass("grayscale")
+                             elt.children("span").removeClass("contrast-50")
+                             elt.children("span").addClass("opacity-50")
                          }
+                         elt.data("state", tgt_state)
                      }
 
+                     function update_add_tags() {
+                         let tags_div = $("#point-select input:checked").closest("#pt-title").next("#pt-tags")
+                         let tags = tags_div.children("span").map((i, e) => $(e).text()).get()
+                         $("#add-tags").children("span").map((i, e) => {
+                             // if everything is unchecked, then everything should be neutrajl
+                             if (tags.length == 0) {
+                                 set_filter_state($(e), "neutral")
+                             } else {
+                                 // count occurences, from https://www.30secondsofcode.org/js/s/count-occurrences/
+                                 tag = $(e).children("span").text()
+                                 tag_count = tags.reduce((a, v) => (v === tag ? a + 1 : a), 0)
+                                 if (tag_count == tags_div.length) {
+                                     // then this tag is in every checked box
+                                     set_filter_state($(e), "active")
+                                 } else if (tag_count > 0) {
+                                     // then it's in at least one checked box
+                                     set_filter_state($(e), "neutral")
+                                 } else {
+                                     // then it's in no checked boxes
+                                     set_filter_state($(e), "inactive")
+                                 }
+                             }
+                         })
+                     }
 
                      // for some reason, can't get hx-on working, but this does the same thing
-                       htmx.on('htmx:afterSwap', (e) => {
-                           if ($(e.target).attr('id') == "points-list") {
-                               sort_and_scroll()
-                               $("#points-list button").map((i, d) => {
-                                   $(d).on('click', () => {
-                                       let trigger_id = $(d).attr("id").replace("pt-", "func-")
-                                       $(`#${trigger_id}`).trigger('click')
-                                   })
-                               })
-                           }
-                       })
-                        $("#tag-filter-toggle").on("click", () => $("#tag-filter").toggle())
-                        $("#tag-filter input").each((i, e) => {
-                            $(e).prop('checked', false)
-                        })
-                        $("#text-filter-toggle").on("click", () => $("#text-filter").toggle())
-                        let visible_details = new Set($(".pt-details:visible").map((x, e) => $(e).prop('id')).get())
-                        $("#text-filter input").each((i, e) => {
-                            if (visible_details.has(`pt-${$(e).prop('id')}`)) {
-                                $(e).prop('checked', true)
-                            } else {
-                                $(e).prop('checked', false)
-                            }
-                        })
+                     htmx.on('htmx:afterSwap', (e) => {
+                         console.log($(e.target).attr('id'))
+                         if ($(e.target).attr('id') == "points-list") {
+                             sort_and_scroll()
+                             $("#points-list button").map((i, d) => {
+                                 // don't invoke function if the checkbox was clicked
+                                 $(d).on('click', (e) => {
+                                     if ($(e.target).attr("id") !== "point-select") {
+                                         let trigger_id = $(d).attr("id").replace("pt-", "func-")
+                                         $(`#${trigger_id}`).trigger('click')
+                                     }
+                                 })
+                             })
+                         } else if ($(e.target).attr('id') == "add-tags") {
+                             update_add_tags()
+                         }
+                     })
+                     $("#tag-filter-toggle").on("click", () => $("#tag-filter").toggle())
+                     $("#add-tags-toggle").on("click", () => $("#add-tags").toggle())
+                     $("#point-select input").each((i, e) => {
+                         $(e).prop('checked', false)
+                     })
+                     $("#tag-filter input").each((i, e) => {
+                         $(e).prop('checked', false)
+                     })
+                     $("#text-filter-toggle").on("click", () => $("#text-filter").toggle())
+                     let visible_details = new Set($(".pt-details:visible").map((x, e) => $(e).prop('id')).get())
+                     $("#text-filter input").each((i, e) => {
+                         if (visible_details.has(`pt-${$(e).prop('id')}`)) {
+                             $(e).prop('checked', true)
+                         } else {
+                             $(e).prop('checked', false)
+                         }
+                     })
                     </script>
                 </div>
             {% endif %}

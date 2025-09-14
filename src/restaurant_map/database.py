@@ -121,6 +121,21 @@ class DataBase:
             return transform
         self.points.update(update_tag(old_tag, new_tag))
 
+    def bulk_update_tags(self, pt_ids: list[str], tags_add: list[str], tags_remove: list[str]):
+        def update_tag():
+            # this will overwrite specified fields, but leave those unincluded
+            # or with None values untouched
+            def transform(doc):
+                for tag in tags_add:
+                    if tag not in doc["properties"]["tags"]:
+                        doc["properties"]["tags"].append(tag)
+                for tag in tags_remove:
+                    if tag in doc["properties"]["tags"]:
+                        doc["properties"]["tags"].remove(tag)
+            return transform
+        self.points.update(update_tag(), self.point_query.id.one_of(pt_ids))
+        self.add_tags(tags_add)
+
     def update_point(self, pt_id: str, data: dict):
         def update_properties(new_properties):
             # this will overwrite specified fields, but leave those unincluded

@@ -122,6 +122,22 @@ def get_tag_css(
     )
 
 
+@router.get("/add_tags")
+def get_add_tags(
+        request: Request,
+) -> HTMLResponse:
+    time.sleep(.1)
+    return templates.TemplateResponse(
+        "main.html",
+        {
+            "request": request,
+            "tags": db.tags.all(),
+            "show_add_tags": True,
+        },
+        block_name="add_tags"
+    )
+
+
 @router.get("/tags")
 def get_tags_list(
         request: Request,
@@ -155,13 +171,12 @@ def export_all_points(
                 pt["properties"]["display"] = {tag: pt_tag}
     return points
 
-
-@router.get("/points_list")
-def points_list(
+def render_points_list(
         request: Request,
-        filter_text: Annotated[list[str] | None, Query()] = [],
-        filter_tags_include: Annotated[list[str] | None, Query()] = [],
-        filter_tags_exclude: Annotated[list[str] | None, Query()] = [],
+        filter_text: list[str] = [],
+        filter_tags_include: list[str] = [],
+        filter_tags_exclude: list[str] = [],
+        selected: list[str] = [],
 ) -> HTMLResponse:
     points = db.find_tags(filter_tags_include, filter_tags_exclude)
     if request.headers.get("hx-current-url", "list").endswith("list"):
@@ -179,9 +194,39 @@ def points_list(
             "show_address": "address" in filter_text,
             "show_description": "description" in filter_text,
             "subgrid": subgrid,
+            "selected": selected,
         },
         block_name="point_list",
     )
+
+
+@router.post("/points_list")
+def update_points_list(
+        request: Request,
+        filter_text: Annotated[list[str] | None, Form()] = [],
+        filter_tags_include: Annotated[list[str] | None, Form()] = [],
+        filter_tags_exclude: Annotated[list[str] | None, Form()] = [],
+        add_tag_input: Annotated[list[str] | None, Form()] = [],
+        add_tags_include: Annotated[list[str] | None, Form()] = [],
+        add_tags_exclude: Annotated[list[str] | None, Form()] = [],
+        point_select_checkbox: Annotated[list[str] | None, Form()] = [],
+) -> HTMLResponse:
+    tags = [t for t in add_tags_include + add_tag_input if t]
+    db.bulk_update_tags(point_select_checkbox, tags, add_tags_exclude)
+    return render_points_list(request, filter_text,
+                              filter_tags_include, filter_tags_exclude,
+                              point_select_checkbox)
+
+@router.get("/points_list")
+def points_list(
+        request: Request,
+        filter_text: Annotated[list[str] | None, Query()] = [],
+        filter_tags_include: Annotated[list[str] | None, Query()] = [],
+        filter_tags_exclude: Annotated[list[str] | None, Query()] = [],
+) -> HTMLResponse:
+    return render_points_list(request, filter_text,
+                              filter_tags_include,
+                              filter_tags_exclude)
 
 
 @router.get("/details/{pt_id}")
