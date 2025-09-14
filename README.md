@@ -36,13 +36,13 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 - [x] add toggles for included fields
 - [ ] add export to text, with toggles for which fields to include
 - [ ] check how exported geojson works with organic maps or osmand
-- [ ] show tags at top of page and filter them by tapping on them
+- [x] show tags at top of page and filter them by tapping on them
 - [x] then [ch 4](https://github.com/tataraba/simplesite/blob/main/docs/04_Chapter_4.md)
 - [ ] add point: with all fields, autocomplete existing tags. add ability to put in either coordinates or address and geocode to other
     - [ ] import, go right to add point, pre-completing those fields. then test with google maps, organic maps, etc
-- [ ] bulk edit tags: click to select locations and then add/remove tags to all, auto-completing
-- [ ] list should be easy to filter, sort, and include/exclude various info
-    - [ ] should have "more info" button, which shows everything about current point. same as edit view, but can't edit
+- [x] bulk edit tags: click to select locations and then add/remove tags to all, auto-completing
+- [x] list should be easy to filter, sort, and include/exclude various info
+    - [x] should have "more info" button, which shows everything about current point. same as edit view, but can't edit
 - [ ] tag view? showing all tags, with number of tagged places, and making ontology clear
 - [ ] lists: add selected points / tags to list, then have separate ability to just view them
 - [ ] make website a [progressive web
