@@ -199,7 +199,6 @@
 
                      // for some reason, can't get hx-on working, but this does the same thing
                      htmx.on('htmx:afterSwap', (e) => {
-                         console.log($(e.target).attr('id'))
                          if ($(e.target).attr('id') == "points-list") {
                              sort_and_scroll()
                              $("#points-list button").map((i, d) => {
