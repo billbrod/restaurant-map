@@ -173,6 +173,22 @@ def export_points(
                 pt["properties"]["display"] = {tag: pt_tag}
     return points
 
+
+@router.get("/points")
+def export_point_redirect(
+        request: Request,
+        filter_tags_include: Annotated[list[str], Query()] = [],
+        filter_tags_exclude: Annotated[list[str], Query()] = [],
+) -> HTMLResponse:
+    query = [f"filter_tags_include={i}" for i in filter_tags_include]
+    query += [f"filter_tags_exclude={i}" for i in filter_tags_exclude]
+    if query:
+        redirect = f"/points.json?{'&'.join(query)}"
+    else:
+        redirect = "/points.json"
+    return HTMLResponse(headers={"HX-Redirect": redirect})
+
+
 def render_points_list(
         request: Request,
         filter_text: list[str] = [],

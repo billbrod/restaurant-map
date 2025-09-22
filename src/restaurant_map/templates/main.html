@@ -34,6 +34,11 @@
                                 Edit Tags
                             </span>
                         {% endif %}
+                        <span id="export-geojson" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2"
+                              hx-get="/points" hx-trigger="click" hx-include="#tag-filter">
+                            <img class="inline" src="/static/images/export-geojson.svg" />
+                            Export GeoJSON
+                        </span>
                     </div>
                     <form id="text-filter" class="grid gap-2 grid-cols-2 justify-items-start border-slate-200 rounded-md border-2 p-2 mx-2"
                           style="display:none" hx-get="/points_list" hx-target="#points-list" hx-swap="outerHTML" hx-trigger="change"
