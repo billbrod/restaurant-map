@@ -63,112 +63,144 @@ map.on('load', async () => {
       }
     })
   })
-  map.addSource("locations", {
-    type: "geojson",
-    data: points,
-    cluster: true,
-    clusterMaxZoom: 14, // Max zoom to cluster points on
-    clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
-  })
-  map.addLayer({
-    id: "unclustered-points",
-    type: "circle",
-    source: "locations",
-    filter: ['!', ['has', 'point_count']],
-    paint: {
-      "circle-color": ["get", "color", ["get", "display", ["properties"]]],
-      "circle-radius": 6,
-      "circle-stroke-width": 2,
-      "circle-stroke-color": "#000",
-    },
-  })
-  map.addLayer({
-    id: 'clusters',
-    type: 'circle',
-    source: 'locations',
-    filter: ['has', 'point_count'],
-    paint: {
-      // Use step expressions with three steps to implement three types of circles:
-      //   * Blue, 20px circles when point count is less than 3
-      //   * Yellow, 30px circles when point count is between 3 and 5
-      //   * Pink, 40px circles when point count is greater than or equal to 5
-      'circle-color': [
-        'step',
-        ['get', 'point_count'],
-        '#51bbd6',
-        3,
-        '#f1f075',
-        5,
-        '#f28cb1'
-      ],
-      'circle-radius': [
-        'step',
-        ['get', 'point_count'],
-        20,
-        3,
-        30,
-        5,
-        40
-      ]
-    }
-  });
-  map.addLayer({
-    id: 'cluster-count',
-    type: 'symbol',
-    source: 'locations',
-    filter: ['has', 'point_count'],
-    layout: {
-      'text-field': '{point_count_abbreviated}',
-      'text-font': ['Noto Sans Regular'],
-      'text-size': 12
-    }
-  });
-  // inspect a cluster on click
-  map.on('click', 'clusters', async (e) => {
-    const features = map.queryRenderedFeatures(e.point, {
-      layers: ['clusters']
+  function add_source_and_cluster(points, source_name) {
+    map.addSource(source_name, {
+      type: "geojson",
+      data: points,
+      cluster: true,
+      clusterMaxZoom: 14, // Max zoom to cluster points on
+      clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+    })
+    subset_name = source_name.replace("locations", "")
+    map.setGlobalStateProperty("visible_subset", subset_name)
+    map.addLayer({
+      id: `clusters${subset_name}`,
+      type: 'circle',
+      source: source_name,
+      filter: ['has', 'point_count'],
+      paint: {
+        // Use step expressions with three steps to implement three types of circles:
+        //   * Blue, 20px circles when point count is less than 3
+        //   * Yellow, 30px circles when point count is between 3 and 5
+        //   * Pink, 40px circles when point count is greater than or equal to 5
+        'circle-color': [
+          'step',
+          ['get', 'point_count'],
+          '#51bbd6',
+          3,
+          '#f1f075',
+          5,
+          '#f28cb1'
+        ],
+        'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          20,
+          3,
+          30,
+          5,
+          40
+        ]
+      }
     });
-    const clusterId = features[0].properties.cluster_id;
-    const zoom = await map.getSource('locations').getClusterExpansionZoom(clusterId);
-    map.easeTo({
-      center: features[0].geometry.coordinates,
-      zoom
+    map.addLayer({
+      id: `clusters-count${subset_name}`,
+      type: 'symbol',
+      source: source_name,
+      filter: ['has', 'point_count'],
+      layout: {
+        'text-field': '{point_count_abbreviated}',
+        'text-font': ['Noto Sans Regular'],
+        'text-size': 12
+      }
     });
-    e.clickOnLayer = true;
-  });
-  map.addLayer({
-    id: 'location-name',
-    type: 'symbol',
-    source: 'locations',
-    filter: ['!', ['has', 'point_count']],
-    layout: {
-      'text-field': ["get", "name"],
-      'text-font': ['Noto Sans Regular'],
-      'text-size': 12,
-      'text-offset': [0, -1],
-      'text-anchor': "bottom",
-    },
-    paint: {
-      'text-halo-color': '#fff',
-      'text-halo-width': 100,
+    // inspect a cluster on click
+    map.on('click', `clusters${subset_name}`, async (e) => {
+      e.clickOnLayer = true;
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: [`clusters${subset_name}`]
+      });
+      const clusterId = features[0].properties.cluster_id;
+      const zoom = await map.getSource(source_name).getClusterExpansionZoom(clusterId);
+      map.easeTo({
+        center: features[0].geometry.coordinates,
+        zoom
+      });
+    });
+    map.addLayer({
+      id: `unclustered-points${subset_name}`,
+      type: "circle",
+      source: source_name,
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+        "circle-color": ["get", "color", ["get", "display", ["properties"]]],
+        "circle-radius": 6,
+        "circle-stroke-width": 2,
+        "circle-stroke-color": "#000",
+      },
+    })
+    map.addLayer({
+      id: `location-name${subset_name}`,
+      type: 'symbol',
+      source: source_name,
+      filter: ['!', ['has', 'point_count']],
+      layout: {
+        'text-field': ["get", "name"],
+        'text-font': ['Noto Sans Regular'],
+        'text-size': 12,
+        'text-offset': [0, -1],
+        'text-anchor': "bottom",
+      },
+      paint: {
+        'text-halo-color': '#fff',
+        'text-halo-width': 100,
+      }
+    });
+    map.on('click', `unclustered-points${subset_name}`, (e) => {
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      const properties = e.features[0].properties;
+      if ($("#points-list").length == 0) {
+        $(`#trigger-${properties.id}`).prop('checked', true)
+        htmx.trigger(`#trigger-${properties.id}`, `detail-${properties.id}`)
+      } else {
+        sort_and_scroll(coordinates)
+        click_marker.remove()
+        marker_on_map = false;
+        marker_just_removed = false;
+        $(`#pt-${properties.id}`).trigger("focus")
+      }
+      e.clickOnLayer = true;
+      map.flyTo({center: coordinates})
+    });
+  }
+  add_source_and_cluster(points, "locations")
+  $("#tag-filter").on("click", async () => {
+    var include = $("#tag-filter input[name='filter_tags_include']:checked")
+    var exclude = $("#tag-filter input[name='filter_tags_exclude']:checked")
+    query = include.map((i, e) => `filter_tags_include=${$(e).val()}`).get()
+    query = query.concat(exclude.map((i, e) => `filter_tags_exclude=${$(e).val()}`).get())
+    visible_subset = map.getGlobalState()["visible_subset"]
+    query_str = ""
+    if (query.length > 0) {
+      query_str = `?${query.join("&")}`
     }
-  });
-  map.on('click', 'unclustered-points', (e) => {
-    const coordinates = e.features[0].geometry.coordinates.slice();
-    const properties = e.features[0].properties;
-    if ($("#points-list").length == 0) {
-      $(`#trigger-${properties.id}`).prop('checked', true)
-      htmx.trigger(`#trigger-${properties.id}`, `detail-${properties.id}`)
-    } else {
-      sort_and_scroll(coordinates)
-      click_marker.remove()
-      marker_on_map = false;
-      marker_just_removed = false;
-      $(`#pt-${properties.id}`).trigger("focus")
+    if (visible_subset != query_str) {
+      map.setLayoutProperty(`clusters${visible_subset}`, "visibility", "none")
+      map.setLayoutProperty(`clusters-count${visible_subset}`, "visibility", "none")
+      map.setLayoutProperty(`unclustered-points${visible_subset}`, "visibility", "none")
+      map.setLayoutProperty(`location-name${visible_subset}`, "visibility", "none")
+      if (!map.getLayer(`clusters${query_str}`)) {
+        add_source_and_cluster(await getData(`/points.json${query_str}&add_tags=color`),
+                               `locations${query_str}`)
+      } else {
+        map.setLayoutProperty(`clusters${query_str}`, "visibility", "visible")
+        map.setLayoutProperty(`clusters-count${query_str}`, "visibility", "visible")
+        map.setLayoutProperty(`unclustered-points${query_str}`, "visibility", "visible")
+        map.setLayoutProperty(`location-name${query_str}`, "visibility", "visible")
+        map.setGlobalStateProperty("visible_subset", query_str)
+      }
     }
-    e.clickOnLayer = true;
-    map.flyTo({center: coordinates})
-  });
+  })
   click_marker.getElement().addEventListener('click', (e) => {
     click_marker.remove()
     marker_on_map = false;

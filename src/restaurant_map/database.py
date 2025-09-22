@@ -55,13 +55,17 @@ class DataBase:
             self,
             include_tags: str | list[str] = [],
             exclude_tags: str | list[str] = [],
+            geojson: bool = False,
     ) -> list[dict]:
         not_q = self.point_query.tags.any(exclude_tags)
         if include_tags:
-            q = self.point_query.tags.any(include_tags)
-            return self.points.search(q & ~not_q)
+            q = self.point_query.tags.all(include_tags)
+            data = self.points.search(q & ~not_q)
         else:
-            return self.points.search(~not_q)
+            data = self.points.search(~not_q)
+        if geojson:
+            data = {"type": "FeatureCollection", "features": data}
+        return data
 
     def ingest_geojson(self, json_path: str):
         with open(json_path) as f:

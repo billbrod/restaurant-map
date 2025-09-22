@@ -152,11 +152,13 @@ def get_tags_list(
 
 
 @router.get("/points.json")
-def export_all_points(
+def export_points(
         request: Request,
-        add_tags: str = ""
+        add_tags: str = "",
+        filter_tags_include: Annotated[list[str], Query()] = [],
+        filter_tags_exclude: Annotated[list[str], Query()] = [],
 ) -> GeoJSON:
-    points = db.export()
+    points = db.find_tags(filter_tags_include, filter_tags_exclude, geojson=True)
     tags = db.export(geojson=False, table="tags")
     tags = {"color": {t["name"]: t["color"] for t in tags}}
     add_tags = add_tags.split(",")

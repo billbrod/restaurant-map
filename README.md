@@ -34,8 +34,14 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
     - [ ] right now just picking a tag, but should pick something reasonable in ontoogy 
 - [x] add name when zoomed in on all the way
 - [x] add toggles for included fields
+- [x] filter by tag on map, not just list
 - [ ] add export to text, with toggles for which fields to include
+    - [ ] export button, one for geojson, one for text, which just exports current view (filtered etc)
 - [ ] check how exported geojson works with organic maps or osmand
+- [ ] add create / import backup, to run from command line
+    - [ ] import backup will overwrite everythign
+    - [ ] create backup will include all tables
+    - [ ] then create script that runs create backup regularly, git committing output
 - [x] show tags at top of page and filter them by tapping on them
 - [x] then [ch 4](https://github.com/tataraba/simplesite/blob/main/docs/04_Chapter_4.md)
 - [ ] add point: with all fields, autocomplete existing tags. add ability to put in either coordinates or address and geocode to other
@@ -48,9 +54,15 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 - [ ] make website a [progressive web
       app](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps#tutorials)
       with offline support
-    - offline should be readonly? would it be possible to get it working for
-      other people who won't be connected to my webserver all the time
+    - offline should be readonly? would it be possible to get it working for other people who won't be connected to my webserver all the time
+        - I don't think so, because there's so much interaction with web server
+        - if I wanted to, the proper way to do this with PWA is to use IndexedDB, and [this synceddb](https://github.com/darrachequesne/synceddb) package looks like a way to sync with remote server via REST API
+        - but I think instead my preferred thing "fully offline" would be to just export what I want and load into CoMaps
     - [maplibre use local geojson](https://maplibre.org/maplibre-gl-js/docs/examples/view-local-geojson/)
+- [ ] PWA:
+    - [ ] make it able to accept data shared from other apps (ideally, google maps and other maps)
+    - [ ] I think can export to phone using [File System API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API)
+    - [ ] and do it regularly with [Periodic Background Sync API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Periodic_Background_Synchronization_API)
 - [ ] offline maps? using pmtiles? resources
     - [maplibre issue](https://github.com/maplibre/maplibre-gl-js/discussions/1580)
     - [pmtiles docs](https://docs.protomaps.com/pmtiles/maplibre)
