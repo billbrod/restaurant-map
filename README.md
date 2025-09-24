@@ -35,8 +35,8 @@ Simple site for saving restaurants, using FastAPI, htmx, tinydb and maplibre-gl.
 - [x] add name when zoomed in on all the way
 - [x] add toggles for included fields
 - [x] filter by tag on map, not just list
-- [ ] add export to text, with toggles for which fields to include
-    - [ ] export button, one for geojson, one for text, which just exports current view (filtered etc)
+- [x] add export to text, with toggles for which fields to include
+    - [x] export button, one for geojson, one for text, which just exports current view (filtered etc)
 - [ ] check how exported geojson works with organic maps or osmand
 - [ ] add create / import backup, to run from command line
     - [ ] import backup will overwrite everythign

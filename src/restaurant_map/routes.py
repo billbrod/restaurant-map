@@ -225,7 +225,7 @@ def create_text_redirect(
     query += [f"filter_text={i}" for i in filter_text]
     if text_format == "md":
         redirect = "/points.md"
-    elif text_format == "txt":
+    else:
         redirect = "/points.txt"
     if query:
         redirect += f"?{'&'.join(query)}"
