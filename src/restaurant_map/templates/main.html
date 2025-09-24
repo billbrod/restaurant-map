@@ -3,23 +3,17 @@
 {% if type == "both" %}
     {% set cols = "grid-cols-4" %}
     {% set list_cols = "grid-cols-1 overflow-y-scroll" %}
-    {% set subgrid = "col-span-1" %}
-{% elif type == "map" %}
-    {% set list_cols = "grid-cols-4 w-screen" %}
 {% else %}
     {% set cols = "grid-cols-1" %}
     {% set list_cols = "grid-cols-4 overflow-y-scroll" %}
-    {% set subgrid = "col-span-4" %}
 {% endif %}
 
 {% block content %}
     <section id="body" class="flex flex-col bg-slate-50 justify-center items-center">
-        <div class="flex flex-col justify-center items-center h-screen w-screen">
-            {% if type == "both" %}
-                <div class="grid {{ cols }} h-screen w-screen">
-            {% endif %}
-                <div id="list-container" class="grid {{ list_cols }} gap-2 justify-start content-start text-center relative pb-2">
-                    <div class="relative flex align-start col-span-full">
+        <div class="flex flex-col justify-start items-center h-screen w-screen">
+                <div id="list-container" class="grid grid-cols-3 w-screen gap-2 content-start relative pb-2">
+                    <div class="col-span-full grid grid-cols-2">
+                    <div class="relative inline">
                         <span id="text-filter-toggle" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2">
                             <img class="inline" src="/static/images/tabler--list-details.svg" />
                             Fields
@@ -34,7 +28,9 @@
                                 Edit Tags
                             </span>
                         {% endif %}
-                        <span id="export-text" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2"
+                    </div>
+                    <div class="relative justify-self-end inline">
+                        <span id="export-md" class="inline relative border-2 border-slate-900 rounded-lg p-1 cursor-pointer hover:bg-slate-200 mr-2"
                               hx-get="/points_text?text_format=md" hx-trigger="click" hx-include="#tag-filter,#text-filter">
                             <img class="inline" src="/static/images/export-md.svg" />
                             Export Markdown
@@ -49,6 +45,7 @@
                             <img class="inline" src="/static/images/export-geojson.svg" />
                             Export GeoJSON
                         </span>
+                    </div>
                     </div>
                     <form id="text-filter" class="grid gap-2 grid-cols-2 justify-items-start border-slate-200 rounded-md border-2 p-2 mx-2"
                           style="display:none" hx-get="/points_list" hx-target="#points-list" hx-swap="outerHTML" hx-trigger="change"
@@ -103,12 +100,13 @@
                     </form>
                     {% endblock %}
                     {% endif %}
-            {% if type == "map" %}
                 </div>
-            {% endif %}
             {% if type in ["both", "list"] %}
+                {% if type == "both" %}
+                    <div class="grid {{ cols }} h-screen w-screen">
+                {% endif %}
                     {% block point_list %}
-                    <div id="points-list" class="{{ subgrid }} grid grid-cols-subgrid">
+                    <div id="points-list" class="{{ list_cols }} grid gap-2 justify-start content-start text-center pb-2">
                     {% block point_entry %}
                         {% for point in points %}
                         <button id="pt-{{point['properties']['id']}}" data-coords={{point["geometry"]["coordinates"]|join(',')}}
@@ -161,7 +159,6 @@
                     {% endblock %}
                     </div>
                     {% endblock %}
-                </div>
             {% endif %}
             {% if type in ["both", "map"] %}
                 <div class="col-span-3 h-full w-full" id="map"></div>

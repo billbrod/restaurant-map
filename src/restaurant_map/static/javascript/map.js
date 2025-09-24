@@ -44,7 +44,7 @@ map.on('load', async () => {
   var marker_just_removed = false;
   $("#points-list button").map((i, d) => {
     let new_id = $(d).attr("id").replace("pt-", "func-")
-    var p = $("div#list-container").append(
+    var p = $("div#points-list").append(
       `<span style='display:none;' id='${new_id}'></span>`
     )
     function click_button() {
