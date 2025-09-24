@@ -159,7 +159,7 @@ def export_points(
         filter_tags_exclude: Annotated[list[str], Query()] = [],
 ) -> GeoJSON:
     points = db.find_tags(filter_tags_include, filter_tags_exclude, geojson=True)
-    tags = db.export(geojson=False, table="tags")
+    tags = db.export_json(geojson=False, table="tags")
     tags = {"color": {t["name"]: t["color"] for t in tags}}
     add_tags = add_tags.split(",")
     if add_tags == [""]:
@@ -186,6 +186,49 @@ def export_point_redirect(
         redirect = f"/points.json?{'&'.join(query)}"
     else:
         redirect = "/points.json"
+    return HTMLResponse(headers={"HX-Redirect": redirect})
+
+
+@router.get("/points.txt")
+def create_txt(
+        request: Request,
+        filter_tags_include: Annotated[list[str], Query()] = [],
+        filter_tags_exclude: Annotated[list[str], Query()] = [],
+        filter_text: Annotated[list[str] | None, Query()] = [],
+) -> str:
+    points = db.find_tags(filter_tags_include, filter_tags_exclude, geojson=False)
+    return db.create_text(points, markdown=False, filter_text=filter_text)
+
+
+@router.get("/points.md")
+def create_md(
+        request: Request,
+        filter_tags_include: Annotated[list[str], Query()] = [],
+        filter_tags_exclude: Annotated[list[str], Query()] = [],
+        filter_text: Annotated[list[str] | None, Query()] = [],
+) -> str:
+    print(filter_text)
+    points = db.find_tags(filter_tags_include, filter_tags_exclude, geojson=False)
+    return db.create_text(points, filter_text=filter_text)
+
+
+@router.get("/points_text")
+def create_text_redirect(
+        request: Request,
+        text_format: Annotated[str, Query()] = [],
+        filter_tags_include: Annotated[list[str], Query()] = [],
+        filter_tags_exclude: Annotated[list[str], Query()] = [],
+        filter_text: Annotated[list[str] | None, Query()] = [],
+) -> HTMLResponse:
+    query = [f"filter_tags_include={i}" for i in filter_tags_include]
+    query += [f"filter_tags_exclude={i}" for i in filter_tags_exclude]
+    query += [f"filter_text={i}" for i in filter_text]
+    if text_format == "md":
+        redirect = "/points.md"
+    elif text_format == "txt":
+        redirect = "/points.txt"
+    if query:
+        redirect += f"?{'&'.join(query)}"
     return HTMLResponse(headers={"HX-Redirect": redirect})
 
 

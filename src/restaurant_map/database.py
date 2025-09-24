@@ -93,7 +93,7 @@ class DataBase:
             self.add_tags(tags)
         self.points.insert_multiple(points)
 
-    def export(
+    def export_json(
             self,
             export_path: str | None = None,
             geojson: bool = True,
@@ -107,6 +107,54 @@ class DataBase:
         else:
             with open(export_path, "w") as f:
                 json.dump(data, f)
+
+    def create_text(
+            self,
+            points: list[dict] | None = None,
+            save_path: str | None = None,
+            markdown: bool = True,
+            filter_text: list[str] = ["tags", "address", "description"],
+    ):
+        if points is None:
+            points = self.export_json(geojson=False)
+        text = []
+        if markdown:
+            header_func = lambda lvl: f"{lvl*'#'}"
+        else:
+            header_func = lambda lvl: f"{(lvl-1)*'  '}-"
+        def format_header(field):
+            if field == "id":
+                return "ID"
+            else:
+                return " ".join([f.capitalize() for f in
+                                 field.replace("_", " ").split(" ")])
+        for pt in points:
+            pt_text = []
+            props = pt["properties"]
+            pt_text.append(f"{header_func(1)} {props['name']}")
+            if "tags" in filter_text:
+                pt_text.append(f"{header_func(2)} Tags")
+                if markdown:
+                    pt_text.append("\n".join([f"- {t}" for t in props["tags"]]))
+                else:
+                    pt_text[-1] += ": " + "; ".join(props["tags"])
+            for field in ["id", "address", "date_added", "description"]:
+                if field not in filter_text:
+                    continue
+                pt_text.append(f"{header_func(2)} {format_header(field)}")
+                if markdown:
+                    pt_text.append(props[field])
+                else:
+                    pt_text[-1] += f": {props[field]}"
+            if markdown:
+                text.append("\n\n".join(pt_text))
+            else:
+                text.append("\n".join(pt_text))
+        if markdown:
+            return "\n\n".join(text)
+        else:
+            return "\n".join(text)
+
 
     def get_address(self, point: dict) -> str:
         coords = point["geometry"]["coordinates"]
